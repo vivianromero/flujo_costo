@@ -1,0 +1,23 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.vite/
+
+# Backend
+backend/config/.env.local
+backend/codificadores/fixtures/ConfigTodas.json
+backend/__pycache__/
+backend/*.pyc
+backend/.venv
+backend/.venv.local
+
+# Global
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+/backend/apps/codificadores/fixtures/ConfigTodas.json
+/backend/requirements_simple.txt

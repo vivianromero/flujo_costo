@@ -1,0 +1,30 @@
+.sidebar {
+  width: 240px;
+  background-color: #00284d; /* Azul institucional más elegante */
+  color: #ffffff;
+  padding: 1rem;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.sidebar li:hover {
+  background-color: #004080; /* Azul más claro al pasar el mouse */
+  padding-left: 0.75rem;
+}
+
+.sidebar li.active {
+  background-color: #cc0000;
+}
