@@ -1,0 +1,43 @@
+.text-blue-10 {
+  color: #003366;
+}
+.bg-blue-1 {
+  background-color: #eaf0f6;
+}
+.bg-brown-4 {
+  background-color: #eab676;
+}
+.q-btn {
+  font-weight: bold;
+}
+
+.full-header {
+  min-height: 60px;
+}
+.header-institucional {
+  background-color: #eab676 !important;
+  color: #003366 !important;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.usuario-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.usuario-nombre {
+  font-weight: 500;
+  font-size: 16px;
+  color: #003366;
+}
+
+.btn-salir {
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+

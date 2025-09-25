@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
+import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 
-// Ruta principal con layout, sin contenido aún
 const routes = [
   {
     path: '/login',
@@ -15,10 +15,13 @@ const routes = [
       {
         path: '',
         name: 'home',
-        component: {
-          template: '<div></div>' // contenido vacío por ahora
-        }
-      }
+        component: Home
+      },
+      // Aquí puedes agregar más rutas protegidas
+      // {
+      //   path: 'usuarios',
+      //   component: Usuarios
+      // }
     ]
   }
 ]
@@ -28,7 +31,6 @@ export const router = createRouter({
   routes
 })
 
-// Protección básica por token
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   if (!token && to.path !== '/login') {
@@ -37,7 +39,6 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
-
 
 
 
