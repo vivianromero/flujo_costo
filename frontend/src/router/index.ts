@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
 import Login from '@/views/Login.vue'
+import { useSessionStore } from '@/stores/session'
 
-// Ruta principal con layout, sin contenido aún
 const routes = [
   {
     path: '/login',
@@ -11,13 +11,15 @@ const routes = [
   {
     path: '/',
     component: MainLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'home',
         component: {
           template: '<div></div>' // contenido vacío por ahora
-        }
+        },
+        meta: { requiresAuth: true }
       }
     ]
   }
@@ -28,15 +30,19 @@ export const router = createRouter({
   routes
 })
 
-// Protección básica por token
+// Protección por token y sesión
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  if (!token && to.path !== '/login') {
+  const session = useSessionStore()
+  const token = session.token || localStorage.getItem('token')
+
+  // Si no hay token y la ruta requiere autenticación
+  if (to.meta.requiresAuth && !token) {
     next('/login')
   } else {
     next()
   }
 })
+
 
 
 

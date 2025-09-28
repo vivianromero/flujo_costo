@@ -2,29 +2,24 @@ import { defineStore } from 'pinia'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({
-    token: localStorage.getItem('token') || '',
     username: '',
+    token: '',
     ueb: '',
-    role: ''
   }),
   actions: {
+    setUsername(name: string) {
+      this.username = name
+    },
     setToken(token: string) {
       this.token = token
-      localStorage.setItem('token', token)
     },
-    setUserData({ username, ueb, role }: { username: string; ueb: string; role?: string }) {
-      this.username = username
+    setUeb(ueb: string) {
       this.ueb = ueb
-      this.role = role || ''
     },
     clearSession() {
-      this.token = ''
       this.username = ''
+      this.token = ''
       this.ueb = ''
-      this.role = ''
-      localStorage.clear()
     }
   }
 })
-
-

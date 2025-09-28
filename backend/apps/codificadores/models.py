@@ -58,7 +58,7 @@ class UnidadContable(ObjectsManagerAbstract):
         verbose_name = _('UEB')
 
     def __str__(self):
-        return "%s | %s" % (self.codigo, self.nombre)
+        return "%s - %s" % (self.codigo, self.nombre)
 
 
 class Medida(ObjectsManagerAbstract):

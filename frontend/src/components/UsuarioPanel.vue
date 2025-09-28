@@ -1,27 +1,35 @@
 <template>
-  <div style="display: flex; align-items: center; gap: 16px;">
-    <q-icon name="person" size="md" color="blue-10" />
-    <span style="font-size: 16px; font-weight: 500; color: #003366;">Vivian</span>
-    <q-btn
-      label="Salir"
-      color="white"
-      text-color="brown-10"
-      unelevated
-      style="font-weight: bold; padding: 6px 12px; border-radius: 4px;"
-      @click="logout"
-    />
+  <div class="usuario-area">
+    <i class="fas fa-user user-circle"></i>
+    <div class="user-info">
+      <span class="username">{{ session.username || 'Usuario Anónimo' }}</span>
+      <span class="ueb">Unidad: {{ session.ueb || 'Sin UEB' }}</span>
+    </div>
+    <button class="logout-btn" @click="logout">Salir</button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useSessionStore } from '@/stores/session'
 import { useRouter } from 'vue-router'
 
+const session = useSessionStore()
 const router = useRouter()
 
 function logout() {
+  sessionStorage.clear()
+  session.clearSession()
   router.push('/login')
 }
 </script>
+
+<style scoped>
+
+</style>
+
+
+
+
 
 
 

@@ -23,21 +23,84 @@
   align-items: center;
   justify-content: center;
 }
-.usuario-panel {
+
+.usuario-area {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #333;
 }
 
-.usuario-nombre {
-  font-weight: 500;
-  font-size: 16px;
+.user-icon {
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  margin-left: -0.70rem; /* ajusta la cercanía al ícono */
+}
+
+.username {
+  font-weight: bold;
+}
+
+.ueb {
+  font-style: italic;
+  color: #555;
+}
+
+.logout-btn {
+  margin-left: 1rem;
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.logout-btn:hover {
+  background-color: #a93226;
+}
+
+.usuario-area i {
+  font-size: 18px;
   color: #003366;
 }
 
-.btn-salir {
-  font-weight: bold;
-  padding: 6px 12px;
-  border-radius: 4px;
+.usuario-area span {
+  font-weight: 500;
+  color: #003366;
+  margin-left: 0.4rem;
+  margin-right: 1rem;
 }
+
+.usuario-area button {
+  background-color: #703d03;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.user-circle {
+  background-color: #e6d8cb; /* color institucional */
+  color: white;
+  border-radius: 50%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
