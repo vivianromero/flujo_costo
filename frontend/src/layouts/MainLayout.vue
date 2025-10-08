@@ -9,7 +9,11 @@
             <q-avatar circled size="32px" class="bg-blue-2 text-white">
               <q-icon name="fa-solid fa-user" />
             </q-avatar>
-            <span class="q-ml-sm text-subtitle2">{{ session.username || 'Usuario Anónimo' }}</span>
+
+            <div class="column q-ml-sm">
+              <span class="text-subtitle2">{{ session.username || 'Usuario Anónimo' }}</span>
+              <span class="text-caption text-grey-3">Unidad: {{ session.ueb || 'Sin UEB' }}</span>
+            </div>
           </div>
         </q-toolbar-title>
          <!-- Botón salir a la derecha -->
@@ -21,11 +25,13 @@
 
     <!-- Drawer -->
     <q-drawer v-model="leftDrawerOpen" side="left" overlay bordered :width="drawerWidth">
-      <div class="drawer-content">
-        <Menu />
+      <div class="drawer-wrapper" style="position: relative; height: 100%;">
+        <div class="drawer-content">
+          <Menu />
+        </div>
       </div>
-      <div class="resize-handle" @mousedown="startResize" />
     </q-drawer>
+
 
     <!-- Page container -->
     <q-page-container>
@@ -65,28 +71,10 @@
         router.push('/login')
     }
 
-
     function toggleLeftDrawer() {
       leftDrawerOpen.value = !leftDrawerOpen.value
     }
 
-    function startResize(e, MouseEvent) {
-      const startX = e.clientX
-      const startWidth = drawerWidth.value
-
-      const onMouseMove = (moveEvent, MouseEvent) => {
-        const delta = moveEvent.clientX - startX
-        drawerWidth.value = Math.max(200, startWidth + delta) // mínimo 200px
-      }
-
-      const onMouseUp = () => {
-        window.removeEventListener('mousemove', onMouseMove)
-        window.removeEventListener('mouseup', onMouseUp)
-      }
-
-      window.addEventListener('mousemove', onMouseMove)
-      window.addEventListener('mouseup', onMouseUp)
-    }
 </script>
 
 

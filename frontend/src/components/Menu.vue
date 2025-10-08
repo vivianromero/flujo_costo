@@ -36,11 +36,10 @@ onMounted(async () => {
     const response = await fetch('/api/menu', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+        'Authorization': `JWT ${sessionStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       }
     })
-
     if (!response.ok) {
       console.error('Error al cargar el menú:', response.status)
       return
