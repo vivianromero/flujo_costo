@@ -25,10 +25,13 @@
 
     <!-- Drawer -->
     <q-drawer v-model="leftDrawerOpen" side="left" overlay bordered :width="drawerWidth">
-      <div class="drawer-wrapper" style="position: relative; height: 100%;">
-        <div class="drawer-content">
+      <div class="drawer-wrapper" style="position: relative; height: 100%; display: flex;">
+        <!-- Área de menú con scroll -->
+        <div class="drawer-content" style="flex: 1; overflow-y: auto;">
           <Menu />
         </div>
+        <!-- Área de resize separada -->
+        <div class="resize-handle" @mousedown="startResize" />
       </div>
     </q-drawer>
 
@@ -73,6 +76,24 @@
 
     function toggleLeftDrawer() {
       leftDrawerOpen.value = !leftDrawerOpen.value
+    }
+
+    function startResize(e, MouseEvent) {
+      const startX = e.clientX
+      const startWidth = drawerWidth.value
+
+      const onMouseMove = (moveEvent, MouseEvent) => {
+        const delta = moveEvent.clientX - startX
+        drawerWidth.value = Math.max(200, startWidth + delta) // mínimo 200px
+      }
+
+      const onMouseUp = () => {
+        window.removeEventListener('mousemove', onMouseMove)
+        window.removeEventListener('mouseup', onMouseUp)
+      }
+
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseup', onMouseUp)
     }
 
 </script>

@@ -117,17 +117,6 @@
   text-align: center;
 }
 
-.resize-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 6px;
-  height: 100%;
-  cursor: ew-resize;
-  background-color: rgba(0, 0, 0, 0.05);
-  z-index: 10;
-}
-
 /* Estilos jerárquicos por nivel */
 .menu-level-0 .q-item__section,
 .menu-level-0 .q-expansion-item__header {
@@ -175,14 +164,8 @@
   font-size: 50px;
 }
 
-.drawer-content {
-  overflow-y: auto;
-  height: 100%;
-}
-
-/* Scroll fino */
 .drawer-content::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .drawer-content::-webkit-scrollbar-track {
@@ -191,6 +174,13 @@
 
 .drawer-content::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
+  border-radius: 4px;
 }
+
+.resize-handle {
+  width: 6px;
+  cursor: ew-resize;
+  background-color: transparent;
+}
+
 
