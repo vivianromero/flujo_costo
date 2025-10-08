@@ -1,13 +1,12 @@
 <template>
-  <!-- Ítem con submenú -->
   <q-expansion-item
-    v-if="item.submenu?.length"
-    :label="item.name"
-    :icon="item.icon_class"
-    :header-class="`menu-level-${level}`"
-    expand-separator
-    dense
+      v-if="item.submenu?.length"
+      :label="`${item.name}`"
+      :icon="item.icon_class"
+      :header-class="`menu-level-${level}`"
+      expand-separator
   >
+
     <MenuItem
       v-for="child in item.submenu"
       :key="child.id"
@@ -15,24 +14,24 @@
       :level="level + 1"
       @navigate="go"
     />
+
   </q-expansion-item>
 
-  <!-- Ítem final sin submenú -->
   <q-item
-    v-else
-    clickable
-    @click="go(item.url)"
-    :class="`menu-level-${level}`"
-    dense
+      v-else
+      clickable
+      @click="go(item.url)"
+      :class="`menu-level-${level}`"
   >
-    <q-item-section avatar v-if="item.icon_class">
-      <q-icon :class="item.icon_class" />
+  <q-item-section avatar v-if="item.icon_class">
+      <div class="menu-icon-wrapper">
+        <q-icon :class="item.icon_class" />
+      </div>
     </q-item-section>
-
-    <q-item-section>
-      {{ item.name }}
-    </q-item-section>
-  </q-item>
+  <q-item-section :class="`menu-level-${level}`">
+    {{ item.name }}
+  </q-item-section>
+</q-item>
 </template>
 
 <script setup>
