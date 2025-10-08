@@ -549,9 +549,7 @@ class Departamento(ObjectsManagerAbstract):
         return 'Departamento'
 
     def inicializado(self, ueb):
-        if not self:
-            return False
-        return self.fechainicio_departamento.filter(ueb=ueb).exists()
+        return False if not self else False if not self.fechainicio_departamento.filter(ueb=ueb) else True
 
 class TiposNormas(models.IntegerChoices):
     PESADA = 1, 'Pesada'
@@ -1033,10 +1031,6 @@ class ClasificadorCargos(ObjectsManagerAbstract):
     descripcion = models.CharField(unique=True, max_length=160)
     grupo = models.ForeignKey(GrupoEscalaCargo, on_delete=models.PROTECT, related_name='cargo_grupo',
                               verbose_name="Grupo Escala")
-    salario_calculado = models.DecimalField(max_digits=18, decimal_places=2, default=0,
-                                       verbose_name=_("Salario Calculado"),
-                                       validators=[MinValueValidator(0.0000, message=_(
-                                           'El valor debe ser >= 0'))])
     actividad = TextChoicesField(choices_enum=Destino, verbose_name=_("Actividad"))
     vinculo_produccion = IntegerChoicesField(choices_enum=VinculoCargoProduccion,
                                              db_comment='Directo (1), Indirecto Producción (2), Indirecto (3)',

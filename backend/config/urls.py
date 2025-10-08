@@ -28,6 +28,7 @@ urlpatterns = [
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('codificadores/', include('apps.codificadores.urls')),
     path('configuracion/', include('apps.configuracion.urls')),
+    path('api/', include('apps.common.urls')),
     path('', inicio),
 ]
 

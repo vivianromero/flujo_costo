@@ -54,16 +54,27 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'rest_framework',
 ]
+
+#ESTO ES SOLO PARA DESARROLLO
+INSTALLED_APPS_DEVELOP = [
+    'django_extensions',
+]
+
+INSTALLED_APPS += INSTALLED_APPS_DEVELOP
 
 INSTALLED_APPS += [
     'graphene_django',
     'api',
 ]
 
+
 INSTALLED_APPS += [
     'apps.codificadores',
     'apps.configuracion',
+    'apps.common',
+    'apps.app_auth'
 ]
 
 GRAPHENE = {
@@ -77,6 +88,15 @@ AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'apps.common.auth.DRFGraphQLJWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 
 MIDDLEWARE = [
@@ -178,3 +198,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'configuracion.UserUeb'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "menu_cache",
+    }
+}
+
