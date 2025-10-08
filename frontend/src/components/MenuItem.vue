@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import Menu from '@/components/Menu.vue'
+import MenuItem from './MenuItem.vue' // para recursividad
 
 defineProps({
   item: Object,

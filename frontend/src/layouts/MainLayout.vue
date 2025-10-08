@@ -48,13 +48,12 @@
 
 <script setup>
     import { ref } from 'vue'
-    const leftDrawerOpen = ref(true)
-    const drawerWidth = ref(260)
-
-
+    import Menu from '@/components/Menu.vue'
     import { useRouter } from 'vue-router'
     import { useSessionStore } from '@/stores/session'
 
+    const leftDrawerOpen = ref(true)
+    const drawerWidth = ref(260)
     const router = useRouter()
     const session = useSessionStore()
 
