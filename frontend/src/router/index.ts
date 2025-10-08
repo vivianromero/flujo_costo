@@ -16,9 +16,7 @@ const routes = [
       {
         path: '',
         name: 'home',
-        component: {
-          template: '<div></div>' // contenido vacío por ahora
-        },
+        component: () => import('@/views/Inicio.vue'),
         meta: { requiresAuth: true }
       }
     ]
@@ -42,6 +40,7 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
 
 
 

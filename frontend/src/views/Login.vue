@@ -4,7 +4,7 @@
       <div class="card">
         <div class="card-header">
           <div class="logo-container">
-            <img src="/img/cubatabaco_logo.png" alt="Logo" class="logo" />
+            <img src="@/assets/img/cubatabaco_logo.png" alt="Logo" class="logo" />
           </div>
         </div>
 

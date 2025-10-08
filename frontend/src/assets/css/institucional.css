@@ -103,4 +103,27 @@
   justify-content: center;
 }
 
+.logo-institucional {
+  max-width: 220px;
+  margin-top: 100px;
+}
 
+.texto-institucional {
+  margin-top: 20px;
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: bold;
+  color: green; /* Color institucional Tabacuba */
+  text-align: center;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}

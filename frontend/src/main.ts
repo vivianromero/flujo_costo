@@ -4,11 +4,20 @@ import { router } from './router'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 import { apolloClient } from './apollo/client'
 import { createPinia } from 'pinia'
+
+// Quasar core
 import { Quasar } from 'quasar'
 import quasarLang from 'quasar/lang/es'
-import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
 import 'quasar/dist/quasar.css'
+import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
 import '@/assets/css/institucional.css'
+
+// Componentes manuales si no usas auto-import
+import {
+  QLayout, QHeader, QDrawer, QPageContainer, QFooter,
+  QToolbar, QToolbarTitle, QBtn, QAvatar, QIcon,
+  QItem, QItemSection, QList, QCard, QCardSection
+} from 'quasar'
 
 const app = createApp({
   setup() {
@@ -20,10 +29,17 @@ const app = createApp({
 app.use(createPinia())
 app.use(router)
 app.use(Quasar, {
-  plugins: {}, // agregar plugins como Notify, Dialog, etc.
+  components: {
+    QLayout, QHeader, QDrawer, QPageContainer, QFooter,
+    QToolbar, QToolbarTitle, QBtn, QAvatar, QIcon,
+    QItem, QItemSection, QList, QCard, QCardSection
+  },
   lang: quasarLang
 })
+
 app.mount('#app')
+
+
 
 
 
