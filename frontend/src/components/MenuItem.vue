@@ -1,21 +1,32 @@
 <template>
   <!-- Ítem con submenú -->
-  <q-expansion-item
-    v-if="item.submenu?.length"
-    :label="item.name"
-    :icon="item.icon_class"
-    :header-class="`menu-level-${level}`"
-    expand-separator
-    dense
-  >
-    <MenuItem
-      v-for="child in item.submenu"
-      :key="child.id"
-      :item="child"
-      :level="level + 1"
-      @navigate="go"
-    />
-  </q-expansion-item>
+ <q-expansion-item
+  v-if="item.submenu?.length"
+  v-model="isExpanded"
+  :label="item.name"
+  icon=""
+  :header-class="`menu-level-${level}`"
+  expand-separator
+  dense
+>
+  <template #header>
+  <div class="menu-item-inline">
+    <q-icon :class="[item.icon_class, 'menu-icon-size']" />
+    <span>{{ item.name }}</span>
+    <q-space />
+    <q-icon :name="isExpanded ? 'fa fa-angle-down' : 'fa fa-angle-right'" class="menu-expand-icon" />
+  </div>
+</template>
+
+
+  <MenuItem
+    v-for="child in item.submenu"
+    :key="child.id"
+    :item="child"
+    :level="level + 1"
+    @navigate="go"
+  />
+</q-expansion-item>
 
   <!-- Ítem final sin submenú -->
   <q-item
@@ -25,19 +36,20 @@
     :class="`menu-level-${level}`"
     dense
   >
-    <q-item-section avatar v-if="item.icon_class">
-      <q-icon :class="item.icon_class" />
-    </q-item-section>
-
-    <q-item-section>
-      {{ item.name }}
-    </q-item-section>
+    <div class="menu-item-inline">
+      <q-icon :class="[item.icon_class, 'menu-icon-size']" />
+      <span>{{ item.name }}</span>
+    </div>
   </q-item>
+
 </template>
 
 <script setup>
 import { QExpansionItem, QItem, QItemSection, QIcon } from 'quasar'
 import MenuItem from './MenuItem.vue'
+
+import { ref } from 'vue'
+const isExpanded = ref(false)
 
 defineProps({
   item: Object,
