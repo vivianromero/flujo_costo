@@ -10,11 +10,12 @@
   dense
 >
   <template #header>
-  <div class="menu-item-inline">
-    <q-icon :class="[item.icon_class, 'menu-icon-size']" />
-    <span>{{ item.name }}</span>
-    <q-space />
-    <q-icon :name="isExpanded ? 'fa fa-angle-down' : 'fa fa-angle-right'" class="menu-expand-icon" />
+  <div class="menu-expandable-bg">
+    <div class="menu-item-inline">
+      <q-icon :name="isExpanded ? 'fa fa-minus' : 'fa fa-plus'" class="menu-expand-icon" />
+      <q-icon :class="[item.icon_class, 'menu-icon-size']" />
+      <span class="menu-label">{{ item.name }}</span>
+    </div>
   </div>
 </template>
 

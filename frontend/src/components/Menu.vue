@@ -25,13 +25,6 @@ function navigate(url) {
 }
 
 onMounted(async () => {
-  const response = await fetch('/api/menu', {
-    headers: { Authorization: `Bearer ${session.token}` }
-  })
-  menu.value = await response.json()
-})
-
-onMounted(async () => {
   try {
     const response = await fetch('/api/menu', {
       method: 'GET',
