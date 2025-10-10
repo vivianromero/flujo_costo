@@ -110,9 +110,18 @@
 
 .texto-institucional {
   margin-top: 20px;
-  font-size: 1.4rem;
-  font-style: italic;
+  font-size: 2rem;
+  /*font-style: italic;*/
   font-weight: bold;
+  color: green; /* Color institucional Tabacuba */
+  text-align: center;
+}
+
+.subtexto-institucional {
+  margin-top: 5px;
+  font-size: 1rem;
+  font-style: italic;
+  /*font-weight: bold;*/
   color: green; /* Color institucional Tabacuba */
   text-align: center;
 }

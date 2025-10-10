@@ -10,7 +10,10 @@
 
     <!-- Texto institucional -->
     <div class="texto-institucional">
-      Sitio para la gestión de los flujos y costos del tabaco
+      SisGestFC
+    </div>
+    <div class="subtexto-institucional">
+      Sistema para la Gestión del Flujo y Costo del Tabaco
     </div>
   </div>
 </template>
