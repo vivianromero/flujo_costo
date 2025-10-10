@@ -16,25 +16,33 @@
             </div>
           </div>
         </q-toolbar-title>
-         <!-- Botón salir a la derecha -->
+        <!-- Botón salir a la derecha -->
         <q-btn flat dense round icon="fa-solid fa-right-from-bracket" color="white" @click="logout">
-            <q-tooltip>Salir</q-tooltip>
+          <q-tooltip>Salir</q-tooltip>
         </q-btn>
       </q-toolbar>
     </q-header>
 
     <!-- Drawer -->
-    <q-drawer v-model="leftDrawerOpen" side="left" overlay bordered :width="drawerWidth">
-      <div class="drawer-wrapper" style="position: relative; height: 100%; display: flex;">
-        <!-- Área de menú con scroll -->
-        <div class="drawer-content" style="flex: 1; overflow-y: auto;">
-          <Menu />
-        </div>
-        <!-- Área de resize separada -->
-        <div class="resize-handle" @mousedown="startResize" />
+    <q-drawer
+      v-model="leftDrawerOpen"
+      side="left"
+      overlay
+      bordered
+      :width="drawerWidth"
+      class="relative-position"
+    >
+      <!-- Contenido del menú -->
+      <div class="drawer-content full-height scroll">
+        <Menu />
       </div>
-    </q-drawer>
 
+      <!-- Handle de resize en esquina inferior derecha -->
+      <div
+        class="resize-corner"
+        @mousedown="startResize"
+      />
+    </q-drawer>
 
     <!-- Page container -->
     <q-page-container>
@@ -45,9 +53,6 @@
     <q-footer reveal bordered class="bg-grey-8 text-white">
       <q-toolbar>
         <q-toolbar-title>
-         <!-- <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
-          </q-avatar> -->
           <span class="q-ml-sm">Pie de página</span>
         </q-toolbar-title>
       </q-toolbar>
@@ -56,47 +61,60 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
-    import Menu from '@/components/Menu.vue'
-    import { useRouter } from 'vue-router'
-    import { useSessionStore } from '@/stores/session'
+import { ref } from 'vue'
+import Menu from '@/components/Menu.vue'
+import { useRouter } from 'vue-router'
+import { useSessionStore } from '@/stores/session'
 
-    const leftDrawerOpen = ref(true)
-    const drawerWidth = ref(290)
-    const router = useRouter()
-    const session = useSessionStore()
+const leftDrawerOpen = ref(true)
+const drawerWidth = ref(290)
+const isResizing = ref(false)
+const router = useRouter()
+const session = useSessionStore()
 
-    function logout() {
-        session.token = null
-        sessionStorage.clear()
-        session.clearSession()
-        localStorage.removeItem('token')
-        router.push('/login')
-    }
+function logout() {
+  session.token = null
+  sessionStorage.clear()
+  session.clearSession()
+  localStorage.removeItem('token')
+  router.push('/login')
+}
 
-    function toggleLeftDrawer() {
-      leftDrawerOpen.value = !leftDrawerOpen.value
-    }
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
 
-    function startResize(e, MouseEvent) {
-      const startX = e.clientX
-      const startWidth = drawerWidth.value
+function startResize(e) {
+  e.preventDefault()
+  e.stopPropagation()
 
-      const onMouseMove = (moveEvent, MouseEvent) => {
-        const delta = moveEvent.clientX - startX
-        drawerWidth.value = Math.max(200, startWidth + delta) // mínimo 200px
-      }
+  isResizing.value = true
 
-      const onMouseUp = () => {
-        window.removeEventListener('mousemove', onMouseMove)
-        window.removeEventListener('mouseup', onMouseUp)
-      }
+  const startX = e.clientX
+  const startWidth = drawerWidth.value
 
-      window.addEventListener('mousemove', onMouseMove)
-      window.addEventListener('mouseup', onMouseUp)
-    }
+  function onMouseMove(moveEvent) {
+    if (!isResizing.value) return
 
+    const delta = moveEvent.clientX - startX
+    const newWidth = Math.max(200, Math.min(500, startWidth + delta))
+
+    drawerWidth.value = newWidth
+  }
+
+  function onMouseUp() {
+    isResizing.value = false
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+  }
+
+  document.body.style.cursor = 'ew-resize'
+  document.body.style.userSelect = 'none'
+
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
 </script>
-
-
-

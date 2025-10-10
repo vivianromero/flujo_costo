@@ -53,56 +53,6 @@
   color: #555;
 }
 
-.logout-btn {
-  margin-left: 1rem;
-  background-color: #c0392b;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.logout-btn:hover {
-  background-color: #a93226;
-}
-
-.usuario-area i {
-  font-size: 18px;
-  color: #003366;
-}
-
-.usuario-area span {
-  font-weight: 500;
-  color: #003366;
-  margin-left: 0.4rem;
-  margin-right: 1rem;
-}
-
-.usuario-area button {
-  background-color: #703d03;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.user-circle {
-  background-color: #e6d8cb; /* color institucional */
-  color: white;
-  border-radius: 50%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .logo-institucional {
   max-width: 220px;
   margin-top: 100px;
@@ -126,13 +76,47 @@
   text-align: center;
 }
 
+
+.resize-corner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  cursor: e-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+  z-index: 1000;
+  border-top-left-radius: 4px;
+}
+
+.resize-corner:hover {
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.3) 50%);
+}
+
+.drawer-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.drawer-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.drawer-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
 .menu-level-0 { --menu-level: 0; }
 .menu-level-1 { --menu-level: 1; }
 .menu-level-2 { --menu-level: 2; }
 .menu-level-3 { --menu-level: 3; }
 .menu-level-4 { --menu-level: 4; }
 .menu-level-5 { --menu-level: 5; }
-
 
 [class*="menu-level-"] .q-item__section,
 [class*="menu-level-"] .q-expansion-item__header,
@@ -152,10 +136,9 @@
 .menu-item-inline {
   display: flex;
   align-items: center;
-  gap: 6px; /* separa ícono y texto */
+  gap: 6px;
   width: 100%;
 }
-
 
 .menu-icon-wrapper {
   display: flex;
@@ -163,28 +146,10 @@
   justify-content: center;
 }
 
-.drawer-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-.drawer-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.drawer-content::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.resize-handle {
-  width: 6px;
-  cursor: ew-resize;
-  background-color: transparent;
-}
-
 .q-expansion-item__toggle-icon {
   display: none;
 }
+
 
 
 
