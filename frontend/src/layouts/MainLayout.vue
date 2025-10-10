@@ -45,9 +45,9 @@
     <q-footer reveal bordered class="bg-grey-8 text-white">
       <q-toolbar>
         <q-toolbar-title>
-          <q-avatar>
+         <!-- <q-avatar>
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
-          </q-avatar>
+          </q-avatar> -->
           <span class="q-ml-sm">Pie de página</span>
         </q-toolbar-title>
       </q-toolbar>
