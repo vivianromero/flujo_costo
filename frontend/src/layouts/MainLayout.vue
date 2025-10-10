@@ -62,7 +62,7 @@
     import { useSessionStore } from '@/stores/session'
 
     const leftDrawerOpen = ref(true)
-    const drawerWidth = ref(280)
+    const drawerWidth = ref(290)
     const router = useRouter()
     const session = useSessionStore()
 

@@ -1,39 +1,44 @@
 <template>
   <!-- Ítem con submenú -->
- <q-expansion-item
-  v-if="item.submenu?.length"
-  v-model="isExpanded"
-  :label="item.name"
-  icon=""
-  :header-class="`menu-level-${level}`"
-  expand-separator
-  dense
->
-  <template #header>
-  <div class="menu-expandable-bg">
-    <div class="menu-item-inline">
-      <q-icon :name="isExpanded ? 'fa fa-minus' : 'fa fa-plus'" class="menu-expand-icon" />
-      <q-icon :class="[item.icon_class, 'menu-icon-size']" />
-      <span class="menu-label">{{ item.name }}</span>
-    </div>
+  <div v-if="item.submenu?.length">
+    <q-expansion-item
+      :model-value="isExpanded"
+      @update:model-value="toggleExpand"
+      expand-separator
+      dense
+      :header-class="`menu-level-${level}`"
+    >
+      <template #header>
+        <div class="menu-expandable-bg">
+          <div class="menu-item-inline">
+            <q-icon
+              :name="isExpanded ? 'fa fa-angle-down' : 'fa fa-angle-right'"
+              class="menu-expand-icon"
+            />
+            <q-icon :class="[item.icon_class, 'menu-icon-size']" />
+            <span class="menu-label">{{ item.name }}</span>
+          </div>
+        </div>
+      </template>
+
+      <!-- 🔹 Renderiza hijos con control local -->
+      <MenuItem
+        v-for="child in item.submenu"
+        :key="child.id"
+        :item="child"
+        :level="level + 1"
+        :open-item="openItem"
+        @set-open="setOpen"
+        @navigate="emit('navigate', $event)"
+      />
+    </q-expansion-item>
   </div>
-</template>
 
-
-  <MenuItem
-    v-for="child in item.submenu"
-    :key="child.id"
-    :item="child"
-    :level="level + 1"
-    @navigate="go"
-  />
-</q-expansion-item>
-
-  <!-- Ítem final sin submenú -->
+  <!-- Ítem sin submenú -->
   <q-item
     v-else
     clickable
-    @click="go(item.url)"
+    @click="emit('navigate', item.url)"
     :class="`menu-level-${level}`"
     dense
   >
@@ -42,24 +47,43 @@
       <span>{{ item.name }}</span>
     </div>
   </q-item>
-
 </template>
 
 <script setup>
 import { QExpansionItem, QItem, QItemSection, QIcon } from 'quasar'
+import { ref, watch } from 'vue'
 import MenuItem from './MenuItem.vue'
 
-import { ref } from 'vue'
-const isExpanded = ref(false)
-
-defineProps({
+const props = defineProps({
   item: Object,
-  level: { type: Number, default: 0 }
+  level: { type: Number, default: 0 },
+  openItem: { type: [Number, String, null], default: null }
 })
 
-defineEmits(['navigate'])
+const emit = defineEmits(['navigate', 'set-open'])
 
-function go(url) {
-  emit('navigate', url)
+const isExpanded = ref(false)
+const openItem = ref(null) // control para hijos
+
+// cerrar si otro hermano se abre
+watch(
+  () => props.openItem,
+  (val) => {
+    if (val !== props.item.id) isExpanded.value = false
+  }
+)
+
+function toggleExpand(val) {
+  isExpanded.value = val
+  if (val) emit('set-open', props.item.id)
+  else emit('set-open', null)
+}
+
+function setOpen(id) {
+  openItem.value = id
 }
 </script>
+
+
+
+

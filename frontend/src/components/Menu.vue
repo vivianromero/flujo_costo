@@ -12,8 +12,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import MenuItem from './MenuItem.vue'
 import { useRouter } from 'vue-router'
+import MenuItem from './MenuItem.vue'
 import { useSessionStore } from '@/stores/session'
 
 const router = useRouter()
@@ -27,7 +27,6 @@ function navigate(url) {
 onMounted(async () => {
   try {
     const response = await fetch('/api/menu', {
-      method: 'GET',
       headers: {
         'Authorization': `JWT ${sessionStorage.getItem('token')}`,
         'Content-Type': 'application/json'
@@ -43,5 +42,5 @@ onMounted(async () => {
     console.error('Error de red al cargar el menú:', error)
   }
 })
-
 </script>
+
