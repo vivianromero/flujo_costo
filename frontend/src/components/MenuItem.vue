@@ -9,13 +9,17 @@
     expand-separator
     dense
   >
-    <template #header>
+    <template v-slot:header>
       <div class="menu-item-inline">
-
-        <q-icon :class="[item.icon_class, 'menu-icon-size']" />
-        <span class="menu-label">{{ item.name }}</span>
+      <div class="menu-icon-wrapper">
+        <q-icon :name="item.icon_class" class="menu-icon-size" />
       </div>
-      <q-icon :name="isExpanded ? 'fa fa-minus' : 'fa fa-plus'" class="menu-expand-icon" />
+      <div class="text-body2">{{ item.name }}</div>
+      <div class="menu-expand-circle menu-expand-icon-wrapper" :class="{ expanded: isExpanded }">
+          <q-icon :name="isExpanded ? 'fa fa-minus' : 'fa fa-plus'" class="menu-expand-icon" />
+      </div>
+
+    </div>
     </template>
 
     <!-- 👇 IMPORTANTE: siempre pasamos item.submenu como parentSubmenu -->
