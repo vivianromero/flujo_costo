@@ -26,7 +26,7 @@ const routes = [
         path: '',
         name: 'home',
         component: () => import('@/views/Inicio.vue'),
-        meta: { breadcrumb: 'Inicio' }
+        meta: { breadcrumb: 'Inicio', icon: 'fa-solid fa-home' }
       }
     ]
   }

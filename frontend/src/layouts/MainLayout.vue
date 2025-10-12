@@ -64,18 +64,19 @@
       <!-- 🧭 Breadcrumbs -->
       <q-breadcrumbs
           class="q-pa-sm bg-grey-2 text-grey-8"
-          icon="chevron_right"
+          separator-icon="chevron_right"
           v-if="breadcrumbs.length"
         >
+          <q-breadcrumbs-el
+            v-for="(crumb, index) in breadcrumbs"
+            :key="index"
+            :label="crumb.label"
+            :to="crumb.to"
+            :icon="crumb.icon"
+            clickable
+          />
+        </q-breadcrumbs>
 
-        <q-breadcrumbs-el
-          v-for="(crumb, index) in breadcrumbs"
-          :key="index"
-          :label="crumb.label"
-          :to="crumb.to"
-          clickable
-        />
-      </q-breadcrumbs>
 
       <!-- (Solo para debug) -->
       <!-- <pre class="q-pa-sm bg-grey-1 text-black">{{ breadcrumbs }}</pre> -->
@@ -164,7 +165,9 @@ function logout() {
 interface Breadcrumb {
   label: string
   to?: string | null
+  icon?: string | null
 }
+
 
 const breadcrumbs = ref<Breadcrumb[]>([])
 
@@ -190,24 +193,36 @@ function findPath(menu: any[], path: string, trail: any[] = []): any[] | null {
 
 // Actualiza los breadcrumbs dinámicamente
 function updateBreadcrumbs() {
+  const currentPath = route.path
+
+  // 🔹 Caso especial: ruta raíz "/" siempre muestra Inicio con icono
+  if (currentPath === '/' || currentPath === '') {
+    breadcrumbs.value = [{ label: 'Inicio', to: '/', icon: 'fa-solid fa-house' }]
+    return
+  }
+
+  // 🔹 Si el menú no está disponible aún, deja el breadcrumb vacío
   if (!menuStore.items || !menuStore.items.length) {
     breadcrumbs.value = []
     return
   }
 
-  const currentPath = route.path
+  // 🔹 Buscar ruta actual en el menú
   const path = findPath(menuStore.items, currentPath)
 
   breadcrumbs.value = path
     ? [
-        { label: 'Inicio', to: '/' },
+        { label: 'Inicio', to: '/', icon: 'fa-solid fa-house' },
         ...path.map((item, i) => ({
           label: item.name,
-          to: i < path.length - 1 && item.url ? normalizeUrl(item.url) : null
+          to: i < path.length - 1 && item.url ? normalizeUrl(item.url) : null,
+          icon: item.icon_class || null
         }))
       ]
-    : [{ label: 'Inicio', to: '/' }]
+    : [{ label: 'Inicio', to: '/', icon: 'fa-solid fa-house' }]
 }
+
+
 
 /* ───────────────────────────────
    📡 Reacciones a cambios
@@ -232,10 +247,9 @@ watch(
 
 // También actualiza cuando se monta el layout
 onMounted(() => {
-  if (menuStore.items.length) {
-    updateBreadcrumbs()
-  }
+  updateBreadcrumbs() // 👈 fuerza actualización inmediata
 })
+
 </script>
 
 

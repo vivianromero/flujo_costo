@@ -103,7 +103,7 @@ MENU = [
                                 {
                                     "id": 'id_nav_link_productos_vitola',
                                     "name": "Vitolas",
-                                    "icon_class": 'fa fa-certificate',
+                                    "icon_class": 'fa-solid fa-smoking',
                                     "url": "/flujo/vitolas",
                                     "validators": ["apps.app_auth.usuarios.validators.is_adminoroperador"],
                                 },

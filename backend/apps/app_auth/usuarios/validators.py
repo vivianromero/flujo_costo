@@ -75,6 +75,7 @@ def is_adminempresa(request):
     """
     Retorna verdadero si el usuario es admin de empresa, si no devuelve falso
     """
+    print(f'Is adminempresa {request.user} {is_authenticated(request) and (request.user.is_adminempresa or request.user.is_superuser)}')
     return is_authenticated(request) and (request.user.is_adminempresa or request.user.is_superuser)
 
 
