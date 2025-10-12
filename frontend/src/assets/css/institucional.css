@@ -124,6 +124,10 @@
   padding-left: calc(var(--menu-level) * 12px) !important;
 }
 
+[class*="menu-level-"] .q-expansion-item__header {
+  position: relative !important;
+}
+
 [class*="menu-level-"] .menu-expand-icon {
   font-size: 10px;
 }
@@ -151,9 +155,11 @@
 }
 
 .menu-expand-icon-wrapper {
-  margin-left: auto;
-  align-items: right;
-  justify-content: right;
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10;
 }
 
 .menu-expand-circle {
@@ -167,14 +173,19 @@
   transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.menu-expand-circle.expanded {
+/* 👇 CORREGIDO - Aplicamos la rotación solo al icono interno */
+.menu-expand-circle.expanded .menu-expand-icon {
   transform: rotate(180deg);
-  background-color: #c0c0c0; /* opcional: color más oscuro al expandir */
+}
+
+.menu-expand-circle.expanded {
+  background-color: #c0c0c0;
 }
 
 .menu-expand-icon {
   font-size: 12px;
   color: #333;
+  transition: transform 0.3s ease; /* 👈 Añadimos transición al icono */
 }
 
 .q-breadcrumbs {

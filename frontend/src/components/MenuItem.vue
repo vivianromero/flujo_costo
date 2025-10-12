@@ -11,18 +11,17 @@
   >
     <template v-slot:header>
       <div class="menu-item-inline">
-      <div class="menu-icon-wrapper">
-        <q-icon :name="item.icon_class" class="menu-icon-size" />
-      </div>
-      <div class="text-body2">{{ item.name }}</div>
-      <div class="menu-expand-circle menu-expand-icon-wrapper" :class="{ expanded: isExpanded }">
+        <div class="menu-icon-wrapper">
+          <q-icon :name="item.icon_class" class="menu-icon-size" />
+        </div>
+        <div class="text-body2">{{ item.name }}</div>
+        <!-- El icono se posiciona absolutamente gracias al CSS -->
+        <div class="menu-expand-circle menu-expand-icon-wrapper" :class="{ expanded: isExpanded }">
           <q-icon :name="isExpanded ? 'fa fa-minus' : 'fa fa-plus'" class="menu-expand-icon" />
+        </div>
       </div>
-
-    </div>
     </template>
 
-    <!-- 👇 IMPORTANTE: siempre pasamos item.submenu como parentSubmenu -->
     <MenuItem
       v-for="child in item.submenu"
       :key="child.id"
