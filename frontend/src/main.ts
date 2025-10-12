@@ -16,7 +16,8 @@ import '@/assets/css/institucional.css'
 import {
   QLayout, QHeader, QDrawer, QPageContainer, QFooter,
   QToolbar, QToolbarTitle, QBtn, QAvatar, QIcon,
-  QItem, QItemSection, QList, QCard, QCardSection
+  QItem, QItemSection, QList, QCard, QCardSection,
+  QBreadcrumbs, QBreadcrumbsEl
 } from 'quasar'
 
 const app = createApp({
@@ -32,7 +33,8 @@ app.use(Quasar, {
   components: {
     QLayout, QHeader, QDrawer, QPageContainer, QFooter,
     QToolbar, QToolbarTitle, QBtn, QAvatar, QIcon,
-    QItem, QItemSection, QList, QCard, QCardSection
+    QItem, QItemSection, QList, QCard, QCardSection,
+    QBreadcrumbs, QBreadcrumbsEl
   },
   lang: quasarLang
 })

@@ -108,7 +108,7 @@ async function login() {
 
     // 3. Delegar a useAuth
     auth.login(token, name, unidad)
-    router.push('/')
+    router.push({ name: 'home' })
   } catch (e) {
     error.value = 'Error de red o servidor: ' + String(e)
   }

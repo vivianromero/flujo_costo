@@ -10,24 +10,21 @@ def ejecutar_validadores(validators, user):
     return True
 
 def filtrar_menu_por_usuario(menu, request):
+    def limpiar_validadores_recursivo(item):
+        item.pop("validators", None)
+        if "submenu" in item:
+            item["submenu"] = [
+                limpiar_validadores_recursivo(subitem)
+                for subitem in item["submenu"]
+                if ejecutar_validadores(subitem.get("validators", []), request)
+            ]
+        return item
+
     resultado = []
-
     for modulo in menu:
-        if not ejecutar_validadores(modulo.get("validators", []), request):
-            continue
-
-        subfiltradas = [
-            op for op in modulo.get("submenu", [])
-            if ejecutar_validadores(op.get("validators", []), request)
-        ]
-
-
-        resultado.append({
-            "id": modulo["id"],
-            "name": modulo["name"],
-            "icon_class": modulo.get("icon_class", ""),
-            "submenu": subfiltradas
-        })
-
+        if ejecutar_validadores(modulo.get("validators", []), request):
+            resultado.append(limpiar_validadores_recursivo(modulo))
     return resultado
+
+
 

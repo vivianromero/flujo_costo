@@ -73,6 +73,8 @@ INSTALLED_APPS += [
 INSTALLED_APPS += [
     'apps.codificadores',
     'apps.configuracion',
+    'apps.flujo',
+    'apps.costo',
     'apps.common',
     'apps.app_auth'
 ]

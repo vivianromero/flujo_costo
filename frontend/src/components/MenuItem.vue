@@ -11,10 +11,11 @@
   >
     <template #header>
       <div class="menu-item-inline">
-        <q-icon :name="isExpanded ? 'fa fa-angle-down' : 'fa fa-angle-right'" class="menu-expand-icon" />
+
         <q-icon :class="[item.icon_class, 'menu-icon-size']" />
         <span class="menu-label">{{ item.name }}</span>
       </div>
+      <q-icon :name="isExpanded ? 'fa fa-minus' : 'fa fa-plus'" class="menu-expand-icon" />
     </template>
 
     <!-- 👇 IMPORTANTE: siempre pasamos item.submenu como parentSubmenu -->
@@ -47,7 +48,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { QExpansionItem, QItem, QIcon } from 'quasar'
+import { QExpansionItem, QItem, QIcon} from 'quasar'
 import MenuItem from './MenuItem.vue'
 
 const props = defineProps({
@@ -62,7 +63,6 @@ const emit = defineEmits(['navigate', 'toggle'])
 const isExpanded = computed(() => props.openItems.includes(props.item.id))
 
 function onToggle() {
-  console.log(`[ON TOGGLE] ${props.item.name} | Nivel: ${props.level}`)
   emit('toggle', { item: props.item, parentSubmenu: props.parentSubmenu })
 }
 

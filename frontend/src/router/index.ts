@@ -10,6 +10,7 @@ const routes = [
   },
   {
     path: '/',
+    name: 'main', // 👈 necesario para router.addRoute('main', ...)
     component: MainLayout,
     meta: { requiresAuth: true },
     children: [
@@ -17,7 +18,7 @@ const routes = [
         path: '',
         name: 'home',
         component: () => import('@/views/Inicio.vue'),
-        meta: { requiresAuth: true }
+        meta: { breadcrumb: 'Inicio' }
       }
     ]
   }
@@ -28,17 +29,11 @@ export const router = createRouter({
   routes
 })
 
-// Protección por token y sesión
 router.beforeEach((to, from, next) => {
   const session = useSessionStore()
   const token = session.token || localStorage.getItem('token')
-
-  // Si no hay token y la ruta requiere autenticación
-  if (to.meta.requiresAuth && !token) {
-    next('/login')
-  } else {
-    next()
-  }
+  if (to.meta.requiresAuth && !token) next('/login')
+  else next()
 })
 
 

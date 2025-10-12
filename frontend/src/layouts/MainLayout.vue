@@ -1,9 +1,16 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <!-- Header -->
+    <!-- ===== HEADER ===== -->
     <q-header reveal bordered class="bg-primary text-white">
       <q-toolbar>
-        <q-btn dense flat round icon="fa-solid fa-bars" color="white" @click="toggleLeftDrawer" />
+        <q-btn
+          dense
+          flat
+          round
+          icon="fa-solid fa-bars"
+          color="white"
+          @click="toggleLeftDrawer"
+        />
         <q-toolbar-title>
           <div class="row items-center no-wrap">
             <q-avatar circled size="32px" class="bg-blue-2 text-white">
@@ -11,45 +18,72 @@
             </q-avatar>
 
             <div class="column q-ml-sm">
-              <span class="text-subtitle2">{{ session.username || 'Usuario Anónimo' }}</span>
-              <span class="text-caption text-grey-3">Unidad: {{ session.ueb || 'Sin UEB' }}</span>
+              <span class="text-subtitle2">
+                {{ session.username || 'Usuario Anónimo' }}
+              </span>
+              <span class="text-caption text-grey-3">
+                Unidad: {{ session.ueb || 'Sin UEB' }}
+              </span>
             </div>
           </div>
         </q-toolbar-title>
-        <!-- Botón salir a la derecha -->
-        <q-btn flat dense round icon="fa-solid fa-right-from-bracket" color="white" @click="logout">
+
+        <!-- Botón salir -->
+        <q-btn
+          flat
+          dense
+          round
+          icon="fa-solid fa-right-from-bracket"
+          color="white"
+          @click="logout"
+        >
           <q-tooltip>Salir</q-tooltip>
         </q-btn>
       </q-toolbar>
     </q-header>
 
-    <!-- Drawer -->
+    <!-- ===== DRAWER ===== -->
     <q-drawer
       v-model="leftDrawerOpen"
       side="left"
-      overlay
+      behavior="desktop"
       bordered
       :width="drawerWidth"
       class="relative-position"
     >
-      <!-- Contenido del menú -->
       <div class="drawer-content full-height scroll">
         <Menu />
       </div>
 
-      <!-- Handle de resize en esquina inferior derecha -->
-      <div
-        class="resize-corner"
-        @mousedown="startResize"
-      />
+      <!-- Handle para resize -->
+      <div class="resize-corner" @mousedown="startResize" />
     </q-drawer>
 
-    <!-- Page container -->
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <q-page-container>
+      <!-- 🧭 Breadcrumbs -->
+      <q-breadcrumbs
+          class="q-pa-sm bg-grey-2 text-grey-8"
+          icon="chevron_right"
+          v-if="breadcrumbs.length"
+        >
+
+        <q-breadcrumbs-el
+          v-for="(crumb, index) in breadcrumbs"
+          :key="index"
+          :label="crumb.label"
+          :to="crumb.to"
+          clickable
+        />
+      </q-breadcrumbs>
+
+      <!-- (Solo para debug) -->
+      <!-- <pre class="q-pa-sm bg-grey-1 text-black">{{ breadcrumbs }}</pre> -->
+
       <router-view />
     </q-page-container>
 
-    <!-- Footer -->
+    <!-- ===== FOOTER ===== -->
     <q-footer reveal bordered class="bg-grey-8 text-white">
       <q-toolbar>
         <q-toolbar-title>
@@ -60,18 +94,62 @@
   </q-layout>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import Menu from '@/components/Menu.vue'
-import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
+import { useMenuStore } from '@/stores/menu'
 
+/* ───────────────────────────────
+   🔧 Estado y dependencias
+──────────────────────────────── */
 const leftDrawerOpen = ref(true)
 const drawerWidth = ref(290)
 const isResizing = ref(false)
 const router = useRouter()
+const route = useRoute()
 const session = useSessionStore()
+const menuStore = useMenuStore()
 
+/* ───────────────────────────────
+   🚪 Control del Drawer
+──────────────────────────────── */
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function startResize(e: MouseEvent) {
+  e.preventDefault()
+  e.stopPropagation()
+
+  isResizing.value = true
+  const startX = e.clientX
+  const startWidth = drawerWidth.value
+
+  function onMouseMove(moveEvent: MouseEvent) {
+    if (!isResizing.value) return
+    const delta = moveEvent.clientX - startX
+    drawerWidth.value = Math.max(200, Math.min(500, startWidth + delta))
+  }
+
+  function onMouseUp() {
+    isResizing.value = false
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+  }
+
+  document.body.style.cursor = 'ew-resize'
+  document.body.style.userSelect = 'none'
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
+
+/* ───────────────────────────────
+   🔐 Logout
+──────────────────────────────── */
 function logout() {
   session.token = null
   sessionStorage.clear()
@@ -80,41 +158,87 @@ function logout() {
   router.push('/login')
 }
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+/* ───────────────────────────────
+   🧭 Breadcrumbs Dinámicos
+──────────────────────────────── */
+interface Breadcrumb {
+  label: string
+  to?: string | null
 }
 
-function startResize(e) {
-  e.preventDefault()
-  e.stopPropagation()
+const breadcrumbs = ref<Breadcrumb[]>([])
 
-  isResizing.value = true
-
-  const startX = e.clientX
-  const startWidth = drawerWidth.value
-
-  function onMouseMove(moveEvent) {
-    if (!isResizing.value) return
-
-    const delta = moveEvent.clientX - startX
-    const newWidth = Math.max(200, Math.min(500, startWidth + delta))
-
-    drawerWidth.value = newWidth
-  }
-
-  function onMouseUp() {
-    isResizing.value = false
-    window.removeEventListener('mousemove', onMouseMove)
-    window.removeEventListener('mouseup', onMouseUp)
-
-    document.body.style.cursor = ''
-    document.body.style.userSelect = ''
-  }
-
-  document.body.style.cursor = 'ew-resize'
-  document.body.style.userSelect = 'none'
-
-  window.addEventListener('mousemove', onMouseMove)
-  window.addEventListener('mouseup', onMouseUp)
+// Normaliza la URL (asegura que siempre empiece con /)
+function normalizeUrl(url: string) {
+  return '/' + url.replace(/^\/+/, '').replace(/\/+$/, '')
 }
+
+// Busca la ruta actual dentro del árbol del menú
+function findPath(menu: any[], path: string, trail: any[] = []): any[] | null {
+  for (const item of menu) {
+    const currentTrail = [...trail, item]
+    if (item.url && normalizeUrl(item.url) === path) {
+      return currentTrail
+    }
+    if (item.submenu) {
+      const found = findPath(item.submenu, path, currentTrail)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+// Actualiza los breadcrumbs dinámicamente
+function updateBreadcrumbs() {
+  if (!menuStore.items || !menuStore.items.length) {
+    breadcrumbs.value = []
+    return
+  }
+
+  const currentPath = route.path
+  const path = findPath(menuStore.items, currentPath)
+
+  breadcrumbs.value = path
+    ? [
+        { label: 'Inicio', to: '/' },
+        ...path.map((item, i) => ({
+          label: item.name,
+          to: i < path.length - 1 && item.url ? normalizeUrl(item.url) : null
+        }))
+      ]
+    : [{ label: 'Inicio', to: '/' }]
+}
+
+/* ───────────────────────────────
+   📡 Reacciones a cambios
+──────────────────────────────── */
+
+// Cuando cambia la ruta
+onBeforeRouteUpdate((to, from, next) => {
+  updateBreadcrumbs()
+  next()
+})
+
+// Cuando el menú o la ruta cambian
+watch(
+  [() => route.path, () => menuStore.items],
+  ([newPath, newMenu]) => {
+    if (newMenu && newMenu.length) {
+      updateBreadcrumbs()
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+// También actualiza cuando se monta el layout
+onMounted(() => {
+  if (menuStore.items.length) {
+    updateBreadcrumbs()
+  }
+})
 </script>
+
+
+
+
+

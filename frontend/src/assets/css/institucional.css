@@ -150,6 +150,33 @@
   display: none;
 }
 
+.q-breadcrumbs {
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+.q-breadcrumbs-el {
+  cursor: pointer;
+}
+.q-breadcrumbs-el.text-primary {
+  font-weight: bold;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-12px);
+  }
+  60% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1.8s infinite;
+}
+
 
 
 

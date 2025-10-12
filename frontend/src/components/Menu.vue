@@ -18,19 +18,21 @@ import { ref, onMounted, watch } from 'vue'
 import MenuItem from './MenuItem.vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
+import { useMenuStore } from '@/stores/menu'
+import { registerDynamicRoutes } from '@/router/dynamicRoutes'
 
 const router = useRouter()
 const session = useSessionStore()
+const menuStore = useMenuStore()
+
 const menu = ref([])
 const openItems = ref([])
 
 function navigate(url) {
-  console.log('[NAVIGATE]', url)
   router.push(url)
 }
 
 function closeSiblings(parentSubmenu, currentId) {
-  console.log('[CLOSE SIBLINGS]', { parentSubmenu, currentId })
   if (!parentSubmenu) return
   for (const sibling of parentSubmenu) {
     if (sibling.id !== currentId) {
@@ -41,40 +43,43 @@ function closeSiblings(parentSubmenu, currentId) {
 }
 
 function toggleItem({ item, parentSubmenu }) {
-  console.log('[TOGGLE ITEM]', { id: item.id, parentSubmenu })
   const id = item.id
   const isOpen = openItems.value.includes(id)
 
   if (isOpen) {
-    console.log('→ CERRAR', id)
     openItems.value = openItems.value.filter(openId => openId !== id)
   } else {
-    console.log('→ ABRIR', id)
     closeSiblings(parentSubmenu, id)
     openItems.value.push(id)
   }
 }
 
-watch(openItems, (val) => {
-  console.log('[OPEN ITEMS UPDATED]', JSON.stringify(val))
-})
-
 onMounted(async () => {
   try {
     const response = await fetch('/api/menu', {
-      method: 'GET',
       headers: {
         'Authorization': `JWT ${sessionStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       }
     })
     const data = await response.json()
-    console.log('[MENU LOADED]', data)
+
+    console.log('[Menu] 📦 Datos recibidos del backend:', data)
+
     menu.value = data
+    menuStore.setMenu(menu.value)
+
+    console.log('[Menu] ✅ Guardado en Pinia:', menuStore.items)
+
+    // ✅ Registra rutas dinámicas basadas en el menú
+    registerDynamicRoutes(router, menuStore.items)
   } catch (error) {
-    console.error('Error de red al cargar el menú:', error)
+    console.error('[Menu] ❌ Error al cargar el menú:', error)
   }
 })
+
 </script>
+
+
 
 

@@ -8,9 +8,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [vue()],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
   },
   server: {
     port: 5173,
