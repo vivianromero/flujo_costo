@@ -73,6 +73,7 @@ onMounted(async () => {
 
     // ✅ Registra rutas dinámicas basadas en el menú
     registerDynamicRoutes(router, menuStore.items)
+
   } catch (error) {
     console.error('[Menu] ❌ Error al cargar el menú:', error)
   }

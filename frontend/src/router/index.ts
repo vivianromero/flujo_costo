@@ -6,11 +6,19 @@ import { useSessionStore } from '@/stores/session'
 const routes = [
   {
     path: '/login',
-    component: Login
+    name: 'login',
+    component: Login,
+    meta: { public: true } // 👈 útil si más adelante agregas roles o autenticación avanzada
+  },
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    component: () => import('@/views/UnauthorizedView.vue'),
+    meta: { public: true }
   },
   {
     path: '/',
-    name: 'main', // 👈 necesario para router.addRoute('main', ...)
+    name: 'main', // 👈 layout principal
     component: MainLayout,
     meta: { requiresAuth: true },
     children: [
@@ -29,12 +37,24 @@ export const router = createRouter({
   routes
 })
 
+
+// ✅ Protección de rutas
 router.beforeEach((to, from, next) => {
   const session = useSessionStore()
   const token = session.token || localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) next('/login')
-  else next()
+
+  if (to.meta.requiresAuth && !token) {
+    next({ name: 'unauthorized' }) // 👈 redirige aquí en vez de login
+  } else if (to.name === 'login' && token) {
+    next({ name: 'home' })
+  } else {
+    next()
+  }
 })
+
+// ✅ Exportación por defecto opcional (para main.ts)
+export default router
+
 
 
 

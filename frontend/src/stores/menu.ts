@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { registerDynamicRoutes } from '@/router/dynamicRoutes'
 import { router } from '@/router'
 
+
 function normalizeMenu(items: any[]) {
   items.forEach(item => {
     if (item.url) {
@@ -28,4 +29,5 @@ export const useMenuStore = defineStore('menu', {
     }
   }
 })
+
 

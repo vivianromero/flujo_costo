@@ -4,6 +4,8 @@ import { router } from './router'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 import { apolloClient } from './apollo/client'
 import { createPinia } from 'pinia'
+import { restoreDynamicRoutes } from './router/dynamicRoutes'
+import { useMenuStore } from '@/stores/menu'
 
 // Quasar core
 import { Quasar } from 'quasar'
@@ -20,15 +22,16 @@ import {
   QBreadcrumbs, QBreadcrumbsEl
 } from 'quasar'
 
-const app = createApp({
-  setup() {
-    provide(DefaultApolloClient, apolloClient)
-  },
-  render: () => h(App)
-})
+const app = createApp(App)
+const pinia = createPinia()
+app.use(pinia)
 
-app.use(createPinia())
+
+const menuStore = useMenuStore()
+restoreDynamicRoutes(router, menuStore)
+
 app.use(router)
+
 app.use(Quasar, {
   components: {
     QLayout, QHeader, QDrawer, QPageContainer, QFooter,
@@ -40,6 +43,12 @@ app.use(Quasar, {
 })
 
 app.mount('#app')
+
+
+
+
+
+
 
 
 
