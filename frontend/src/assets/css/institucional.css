@@ -215,6 +215,54 @@
   animation: bounce 1.8s infinite;
 }
 
+.rotacion-derecha {
+  animation: giro-derecha 10s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes giro-derecha {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg); /* 👈 giro hacia adelante por el lado derecho */
+  }
+}
+
+/*Footer */
+.footer-toolbar {
+   height: 28px; min-height: 28px; display: flex; justify-content: space-between; align-items: center;
+}
+
+.footer-img {
+    height: 16px; width: auto;
+}
+
+.footer-left {
+   font-size: 11px;
+   display: flex;
+   align-items: center;
+   gap: 4px;7
+}
+
+.footer-right {
+  font-size: 11px;
+}
+
+.footer-site {
+    display: flex;
+    align-items: center;
+    gap: 4px;7
+}
+
+
+
+
+
+
+
+
+
 
 
 
