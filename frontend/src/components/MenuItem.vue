@@ -5,7 +5,7 @@
     :model-value="isExpanded"
     @update:model-value="onToggle"
     :label="item.name"
-    :header-class="`menu-level-${level}`"
+    :header-class="`menu-level-${level}  ${isActive ? 'bg-primary text-white' : ''}`"
     expand-separator
     dense
   >
@@ -39,7 +39,7 @@
     v-else
     clickable
     @click="$emit('navigate', item.url)"
-    :class="`menu-level-${level}`"
+    :class="`menu-level-${level} ${isActive ? 'bg-primary text-white' : ''}`"
     dense
   >
     <div class="menu-item-inline">
@@ -53,6 +53,7 @@
 import { computed } from 'vue'
 import { QExpansionItem, QItem, QIcon} from 'quasar'
 import MenuItem from './MenuItem.vue'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
   item: Object,
@@ -63,6 +64,8 @@ const props = defineProps({
 
 const emit = defineEmits(['navigate', 'toggle'])
 
+const route = useRoute()
+
 const isExpanded = computed(() => props.openItems.includes(props.item.id))
 
 function onToggle() {
@@ -72,6 +75,8 @@ function onToggle() {
 function childToggle(payload) {
   emit('toggle', payload)
 }
+
+const isActive = computed(() => props.item.url && props.item.url === route.path)
 </script>
 
 

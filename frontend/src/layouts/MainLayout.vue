@@ -85,13 +85,7 @@
     </q-page-container>
 
     <!-- ===== FOOTER ===== -->
-    <q-footer reveal bordered class="bg-grey-8 text-white">
-      <q-toolbar>
-        <q-toolbar-title>
-          <span class="q-ml-sm">Pie de página</span>
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-footer>
+    <Footer/>
   </q-layout>
 </template>
 
@@ -101,6 +95,7 @@ import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import Menu from '@/components/Menu.vue'
 import { useSessionStore } from '@/stores/session'
 import { useMenuStore } from '@/stores/menu'
+import Footer from '@/components/Footer.vue'
 
 /* ───────────────────────────────
    🔧 Estado y dependencias
