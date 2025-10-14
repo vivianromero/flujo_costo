@@ -57,11 +57,11 @@ export function registerDynamicRoutes(router: Router, menuItems: any[]) {
   addRoutesRecursively(menuItems)
 
   // ✅ Asegurar que FallbackView esté dentro del layout
-  const hasFallback = router.getRoutes().some((r) => r.name === 'NotFound')
+  const hasFallback = router.getRoutes().some((r) => r.name === '')
   if (!hasFallback) {
     router.addRoute(layoutRouteName, {
       path: ':pathMatch(.*)*',
-      name: 'NotFound',
+      name: '',
       component: () => import('@/views/FallbackView.vue'),
     })
   }

@@ -11,7 +11,7 @@ export const useFooterStore = defineStore('footer', {
   state: () => ({
     site: { domain: 'miempresa.com', name: 'DATAZUCAR', icon: logoDatazucar } as Site,
     year: 2025,
-    version: '0.2'
+    version: '1.0'
   }),
   actions: {
     setSite(site: Site) {

@@ -10,7 +10,7 @@
 
     <!-- Texto institucional -->
     <div class="texto-institucional">
-      SisGestFC
+      SisGesFC
     </div>
     <div class="subtexto-institucional">
       Sistema para la Gestión del Flujo y Costo del Tabaco
