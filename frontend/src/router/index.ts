@@ -1,27 +1,39 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
-import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
+import { useSessionStore } from '@/stores/session'
 
 const routes = [
   {
     path: '/login',
-    component: Login
+    name: 'login',
+    component: Login,
+    meta: { public: true }
+  },
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    component: () => import('@/views/UnauthorizedView.vue'),
+    meta: { public: true }
   },
   {
     path: '/',
+    name: 'main',
     component: MainLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'home',
-        component: Home
+        component: () => import('@/views/Inicio.vue'),
+        meta: { breadcrumb: 'Inicio', icon: 'fa-solid fa-home' }
       },
-      // Aquí puedes agregar más rutas protegidas
-      // {
-      //   path: 'usuarios',
-      //   component: Usuarios
-      // }
+      {
+        path: '/noaccess',
+        name: 'noaccess',
+        component: () => import('@/views/NoAccessView.vue'),
+        meta: { public: true }
+      },
     ]
   }
 ]
@@ -31,14 +43,36 @@ export const router = createRouter({
   routes
 })
 
+// =========================================================
+// ✅ Middleware de autenticación
+// =========================================================
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  if (!token && to.path !== '/login') {
-    next('/login')
-  } else {
+  const session = useSessionStore()
+  const token = session.token || localStorage.getItem('token')
+
+  // 1️⃣ Si la ruta es pública, continuar sin restricciones
+  if (to.meta.public) {
     next()
+    return
   }
+
+  // 2️⃣ Si requiere autenticación y no hay token, ir al login
+  if (to.meta.requiresAuth && !token) {
+    next({ name: 'login' })
+    return
+  }
+
+  // 3️⃣ Si ya hay token y se intenta ir al login, ir al home
+  if (to.name === 'login' && token) {
+    next({ name: 'home' })
+    return
+  }
+
+  // 4️⃣ En cualquier otro caso, continuar
+  next()
 })
+
+export default router
 
 
 

@@ -4,17 +4,18 @@
       <div class="card">
         <div class="card-header">
           <div class="logo-container">
-            <img src="/img/cubatabaco_logo.png" alt="Logo" class="logo" />
+            <img src="@/assets/img/cubatabaco_logo.png" alt="Logo" class="logo" />
           </div>
         </div>
 
         <div class="card-body">
           <p class="login-msg">Introduzca sus datos para comenzar la sesión</p>
           <p v-if="error" class="error-msg">{{ error }}</p>
+
           <div class="form-group">
             <div class="input-wrapper">
               <input v-model="username" class="form-input" placeholder="Usuario" />
-              <i class="fa fa-user input-icon"></i>
+              <i class="fa fa-user input-icon "></i>
             </div>
           </div>
 
@@ -45,50 +46,78 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/utils/useAuth'
 import '@/assets/css/login.css'
-import { useSessionStore } from '@/stores/session'
-
 
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const error = ref('')
 const router = useRouter()
-const session = useSessionStore()
+const auth = useAuth()
 
 function togglePassword() {
   showPassword.value = !showPassword.value
 }
 
 async function login() {
-  const query = `
-    mutation {
-      tokenAuth(username: "${username.value}", password: "${password.value}") {
-        token
-      }
-    }
-  `
-
   try {
-    const res = await fetch('http://localhost:9090/graphql/', {
+    // 1. Autenticación
+    const queryLogin = `
+      mutation {
+        tokenAuth(username: "${username.value}", password: "${password.value}") {
+          token
+        }
+      }
+    `
+    const resLogin = await fetch('http://localhost:9090/graphql/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({ query: queryLogin })
     })
 
-    const { data, errors } = await res.json()
-
-    if (errors) {
-      error.value = 'Por favor, introduzca un nombre de usuario y clave correctos. Observe que ambos campos pueden ser sensibles a mayúsculas.'
-    } else {
-        session.setToken(data.tokenAuth.token)
-        router.push('/')
+    const { data, errors } = await resLogin.json()
+    if (errors || !data?.tokenAuth?.token) {
+      error.value = 'Por favor, introduzca un nombre de usuario y clave correctos.'
+      return
     }
-  } catch (e) {
-    error.value = 'Error de red o servidor'
-  }
 
+    const token = data.tokenAuth.token
+
+    // 2. Consulta de usuario
+    const queryMe = `
+      query {
+        me {
+          username
+          ueb
+        }
+      }
+    `
+    const resMe = await fetch('http://localhost:9090/graphql/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `JWT ${token}`
+      },
+      body: JSON.stringify({ query: queryMe })
+    })
+
+    const resMeJson = await resMe.json()
+    const name = resMeJson?.data?.me?.username || 'Usuario'
+    const unidad = resMeJson?.data?.me?.ueb || 'Unidad'
+
+    // 3. Delegar a useAuth
+    auth.login(token, name, unidad)
+    router.push({ name: 'home' })
+  } catch (e) {
+    error.value = 'Error de red o servidor: ' + String(e)
+  }
 }
 </script>
+
+
+
+
+
 
 

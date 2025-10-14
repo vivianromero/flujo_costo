@@ -1,0 +1,276 @@
+.text-blue-10 {
+  color: #003366;
+}
+.bg-blue-1 {
+  background-color: #eaf0f6;
+}
+.bg-brown-4 {
+  background-color: #eab676;
+}
+.q-btn {
+  font-weight: bold;
+}
+
+.full-header {
+  min-height: 60px;
+}
+.header-institucional {
+  background-color: #eab676 !important;
+  color: #003366 !important;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.usuario-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.user-icon {
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  margin-left: -0.70rem; /* ajusta la cercanía al ícono */
+}
+
+.username {
+  font-weight: bold;
+}
+
+.ueb {
+  font-style: italic;
+  color: #555;
+}
+
+.logo-institucional {
+  max-width: 220px;
+  margin-top: 100px;
+}
+
+.texto-institucional {
+  margin-top: 20px;
+  font-size: 2rem;
+  /*font-style: italic;*/
+  font-weight: bold;
+  color: green; /* Color institucional Tabacuba */
+  text-align: center;
+}
+
+.subtexto-institucional {
+  margin-top: 5px;
+  font-size: 1rem;
+  font-style: italic;
+  /*font-weight: bold;*/
+  color: green; /* Color institucional Tabacuba */
+  text-align: center;
+}
+
+
+.resize-corner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  cursor: e-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+  z-index: 1000;
+  border-top-left-radius: 4px;
+}
+
+.resize-corner:hover {
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.3) 50%);
+}
+
+.drawer-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.drawer-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.drawer-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.menu-level-0 { --menu-level: 0; }
+.menu-level-1 { --menu-level: 1; }
+.menu-level-2 { --menu-level: 2; }
+.menu-level-3 { --menu-level: 3; }
+.menu-level-4 { --menu-level: 4; }
+.menu-level-5 { --menu-level: 5; }
+
+[class*="menu-level-"] .q-item__section,
+[class*="menu-level-"] .q-expansion-item__header,
+[class*="menu-level-"] .menu-item-inline {
+  padding-left: calc(var(--menu-level) * 12px) !important;
+}
+
+[class*="menu-level-"] .q-expansion-item__header {
+  position: relative !important;
+}
+
+[class*="menu-level-"] .menu-expand-icon {
+  font-size: 10px;
+}
+
+[class*="menu-level-"] .menu-icon-size {
+  font-size: 14px;
+  width: auto;
+}
+
+.menu-item-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.menu-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.q-expansion-item__toggle-icon {
+  display: none;
+}
+
+.menu-expand-icon-wrapper {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10;
+}
+
+.menu-expand-circle {
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* 👇 CORREGIDO - Aplicamos la rotación solo al icono interno */
+.menu-expand-circle.expanded .menu-expand-icon {
+  transform: rotate(180deg);
+}
+
+.menu-expand-circle.expanded {
+  background-color: #c0c0c0;
+}
+
+.menu-expand-icon {
+  font-size: 12px;
+  color: #333;
+  transition: transform 0.3s ease; /* 👈 Añadimos transición al icono */
+}
+
+.q-breadcrumbs {
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+.q-breadcrumbs-el {
+  cursor: pointer;
+}
+.q-breadcrumbs-el.text-primary {
+  font-weight: bold;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-12px);
+  }
+  60% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1.8s infinite;
+}
+
+.rotacion-derecha {
+  animation: giro-derecha 10s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes giro-derecha {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg); /* 👈 giro hacia adelante por el lado derecho */
+  }
+}
+
+/*Footer */
+.footer-toolbar {
+   height: 28px; min-height: 28px; display: flex; justify-content: space-between; align-items: center;
+}
+
+.footer-img {
+    height: 16px; width: auto;
+}
+
+.footer-left {
+   font-size: 11px;
+   display: flex;
+   align-items: center;
+   gap: 4px;7
+}
+
+.footer-right {
+  font-size: 11px;
+}
+
+.footer-site {
+    display: flex;
+    align-items: center;
+    gap: 4px;7
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

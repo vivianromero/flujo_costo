@@ -1,8 +1,8 @@
 import graphene
-from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
-from .models import UserUeb
 from apps.codificadores.models import UnidadContable
+from graphene_django.types import DjangoObjectType
+from django.contrib.auth import get_user_model
 
 class UnidadContableType(DjangoObjectType):
     class Meta:
@@ -10,9 +10,14 @@ class UnidadContableType(DjangoObjectType):
         fields = ("id", "codigo", "nombre")  # ← puedes agregar más campos luego
 
 class UserUebType(DjangoObjectType):
+    ueb = graphene.String()
+
     class Meta:
-        model = UserUeb
-        fields = ("id", "username", "ueb")  # ← solo lo esencial por ahora
+        model = get_user_model()
+        fields = ('username', 'ueb')
+
+    def resolve_ueb(self, info):
+        return str(self.ueb) if self.ueb else ''
 
 
 class ConfiguracionQuery(graphene.ObjectType):

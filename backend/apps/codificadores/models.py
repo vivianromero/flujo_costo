@@ -4,9 +4,8 @@ from bulk_update_or_create import BulkUpdateOrCreateQuerySet
 from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.db import models, transaction
-from django.db.models import Count, F, Value, Case, When
+from django.db.models import Case, When, Value, Q, F, Count
 from django.db.models.functions import Now, Concat
-from django.db.models.query_utils import Q
 from django.utils.translation import gettext_lazy as _
 from django_choices_field import IntegerChoicesField, TextChoicesField
 from mptt.managers import TreeManager
@@ -22,7 +21,6 @@ class ObjectsManagerAbstract(models.Model):
 
     class Meta:
         abstract = True
-
 class DatosCacheManager(models.Manager):
     _cache = None
 
@@ -171,7 +169,7 @@ class CentroCosto(ObjectsManagerAbstract):
                 ]
             ),
         ]
-        ordering = ['descripcion', 'clave']
+        ordering = ['clave', 'descripcion']
         verbose_name_plural = _('Centers of cost')
         verbose_name = _('Cost center')
 
@@ -269,7 +267,6 @@ class ProductoFlujo(ObjectsManagerAbstract):
     def get_clasemateriaprima(self):
         return None if self.tipoproducto.pk != ChoiceTiposProd.MATERIAPRIMA else self.productoflujoclase_producto.get().clasemateriaprima
 
-
 class ProductoFlujoClase(ObjectsManagerAbstract):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     clasemateriaprima = models.ForeignKey(ClaseMateriaPrima, on_delete=models.PROTECT,
@@ -282,6 +279,30 @@ class ProductoFlujoClase(ObjectsManagerAbstract):
     def __str__(self):
         return self.clasemateriaprima.descripcion
 
+class TipoHabilitacion(ObjectsManagerAbstract):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    descripcion = models.CharField(unique=True, max_length=100, verbose_name=_("Tipo Habilitación"))
+    activo = models.BooleanField(default=True, verbose_name=_("Active"))
+
+    class Meta:
+        db_table = 'cla_tipohabilitacion'
+        ordering = ['descripcion']
+
+    def __str__(self):
+        return self.descripcion
+
+
+class ProductoFlujoTipoHabilitacion(ObjectsManagerAbstract):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipohabilitacion = models.ForeignKey(TipoHabilitacion, on_delete=models.PROTECT,
+                                          related_name='productosflujo_tipohabilitacion')
+    producto = models.ForeignKey(ProductoFlujo, on_delete=models.CASCADE, related_name='productoflujotipohabilitacion_producto')
+
+    class Meta:
+        db_table = 'cla_productoflujotipohabilitacion'
+
+    def __str__(self):
+        return self.tipohabilitacion.descripcion
 
 class Destino(models.TextChoices):
     CONSUMONACIONAL = 'C', 'Consumo Nacional'
@@ -528,7 +549,9 @@ class Departamento(ObjectsManagerAbstract):
         return 'Departamento'
 
     def inicializado(self, ueb):
-        return False if not self else False if not self.fechainicio_departamento.filter(ueb=ueb) else True
+        if not self:
+            return False
+        return self.fechainicio_departamento.filter(ueb=ueb).exists()
 
 class TiposNormas(models.IntegerChoices):
     PESADA = 1, 'Pesada'
@@ -536,6 +559,41 @@ class TiposNormas(models.IntegerChoices):
     LINEASALIDA = 4, 'Línea de Salida'
     VITOLA = 5, 'Vitola'
     HABILITADOS = 7, 'Habilitados'
+
+
+class NormaConsumoManager(models.Manager):
+
+    def calcular_precio_capasclasificadas(self, normas_ids=None):
+        """
+        Calcula precios promedio para múltiples normas
+        """
+        queryset = self.filter(
+            producto__tipoproducto=ChoiceTiposProd.MATERIAPRIMA,
+            producto__productoflujoclase_producto__clasemateriaprima=ChoiceClasesMatPrima.CAPACLASIFICADA,
+        )
+
+        if normas_ids:
+            queryset = self.filter(id__in=normas_ids)
+
+        # Prefetch para optimizar
+        queryset = queryset.prefetch_related(
+            'normaconsumodetalle_normaconsumo__producto'
+        )
+
+        resultados = {}
+        for norma in queryset:
+            precios = [
+                detalle.producto.precio_lop
+                for detalle in norma.normaconsumodetalle_normaconsumo.all()
+                if detalle.producto.precio_lop is not None
+            ]
+
+            if precios:
+                resultados[norma.id] = sum(precios) / len(precios)
+            else:
+                resultados[norma.id] = None
+
+        return resultados
 
 class NormaConsumo(ObjectsManagerAbstract):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -550,6 +608,7 @@ class NormaConsumo(ObjectsManagerAbstract):
     producto = models.ForeignKey(ProductoFlujo, models.PROTECT, related_name='normaconsumo_producto',
                                  verbose_name=_("Product"))
     tiponorma = IntegerChoicesField(choices_enum=TiposNormas, verbose_name=_("Tipo Norma"))
+    objects = NormaConsumoManager()
 
     class Meta:
         db_table = 'cla_normaconsumo'
@@ -658,10 +717,8 @@ class NumeracionDocumentosCacheManager(DatosCacheManager):
     def get_configuracion_numeracion(self):
         numeracion = self.all()
         list_dicc = [objeto.to_dict() for objeto in numeracion]
-        if list_dicc:
-            dicc = {item["tiponumero"]: item for item in list_dicc}
-            return dicc[TipoNumeroDoc.NUMERO_CONSECUTIVO], dicc[TipoNumeroDoc.NUMERO_CONTROL]
-        return {}, {}
+        dicc = {item["tiponumero"]: item for item in list_dicc}
+        return dicc
 
 
 class NumeracionDocumentos(ObjectsManagerAbstract):
@@ -885,7 +942,6 @@ class ProductsCapasClaPesadasManager(models.Manager):
             Q(tipoproducto=ChoiceTiposProd.PESADA) |
             Q(productoflujoclase_producto__clasemateriaprima=ChoiceClasesMatPrima.CAPACLASIFICADA))
 
-
 class ProductsCapasClaPesadas(ProductoFlujo):
     objects = ProductsCapasClaPesadasManager()
 
@@ -977,6 +1033,10 @@ class ClasificadorCargos(ObjectsManagerAbstract):
     descripcion = models.CharField(unique=True, max_length=160)
     grupo = models.ForeignKey(GrupoEscalaCargo, on_delete=models.PROTECT, related_name='cargo_grupo',
                               verbose_name="Grupo Escala")
+    salario_calculado = models.DecimalField(max_digits=18, decimal_places=2, default=0,
+                                       verbose_name=_("Salario Calculado"),
+                                       validators=[MinValueValidator(0.0000, message=_(
+                                           'El valor debe ser >= 0'))])
     actividad = TextChoicesField(choices_enum=Destino, verbose_name=_("Actividad"))
     vinculo_produccion = IntegerChoicesField(choices_enum=VinculoCargoProduccion,
                                              db_comment='Directo (1), Indirecto Producción (2), Indirecto (3)',
