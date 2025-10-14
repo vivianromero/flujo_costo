@@ -6,6 +6,7 @@ import { apolloClient } from './apollo/client'
 import { createPinia } from 'pinia'
 import { restoreDynamicRoutes } from './router/dynamicRoutes'
 import { useMenuStore } from '@/stores/menu'
+import { useSessionGuard } from '@/utils/useSessionGuard'
 
 // Quasar core
 import { Quasar } from 'quasar'
@@ -29,6 +30,9 @@ app.use(pinia)
 
 const menuStore = useMenuStore()
 restoreDynamicRoutes(router, menuStore)
+
+await useSessionGuard(router)
+app.provide(DefaultApolloClient, apolloClient)
 
 app.use(router)
 
