@@ -2,11 +2,12 @@ import graphene
 import graphql_jwt
 
 from apps.configuracion.schema import ConfiguracionQuery, ConfiguracionMutation, UserUebType
+from apps.codificadores.schema import CodificadoresQuery, CodificadoresMutation
 # Si tienes otros módulos, los importas igual:
-# from apps.codificadores.schema import CodificadoresQuery, CodificadoresMutation
 
 
-class Query(graphene.ObjectType):
+class Query(CodificadoresQuery,
+            graphene.ObjectType):
     me = graphene.Field(UserUebType)
 
     def resolve_me(self, info):
@@ -18,7 +19,7 @@ class Query(graphene.ObjectType):
 
 class Mutation(
     ConfiguracionMutation,
-    # CodificadoresMutation,
+    CodificadoresMutation,
     graphene.ObjectType
 ):
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
