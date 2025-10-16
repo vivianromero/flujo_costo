@@ -7,15 +7,20 @@
     :rows-per-page="pagination.rowsPerPage"
     v-model:pagination="pagination"
     :rows-number="totalCount"
-  />
+    :show-refresh="true"
+    refresh-tooltip="Actualizar Datos"
+    @refresh="refrescar"
+  >
+  </InstitucionalTable>
 </template>
+
 
 <script setup lang="ts">
 import InstitucionalTable from '@/components/InstitucionalTable.vue'
 import { ref, watch } from 'vue'
 import { useDepartamentosPaginado } from '@/composables/useDepartamentosPaginado'
 
-//const pagination = ref({ page: 1, rowsPerPage: 15, rowsNumber: 0 })
+
 const pagination = ref({ page: 1, rowsPerPage: 15 })
 
 const columns = [
@@ -30,7 +35,21 @@ const columns = [
   }
 ]
 
-const { rows, loading, totalCount } = useDepartamentosPaginado({ pagination })
+const { rows, loading, totalCount, refetch } = useDepartamentosPaginado({ pagination })
+
+function refrescar() {
+  console.log('🔁 Refrescando datos manualmente...')
+  loading.value = true
+
+  refetch().then(() => {
+    loading.value = false
+    console.log('✅ Datos actualizados')
+  }).catch((error) => {
+    loading.value = false
+    console.error('❌ Error al refrescar datos:', error)
+  })
+}
+
 
 watch(totalCount, (newTotal) => {
   pagination.value.rowsNumber = newTotal

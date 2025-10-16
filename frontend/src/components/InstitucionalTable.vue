@@ -1,5 +1,19 @@
 <template>
   <div class="institucional-table q-pa-md">
+      <q-btn
+          flat
+          dense
+          round
+          size="xs"
+          icon="fa-solid fa-rotate"
+          color="blue-2"
+          @click="emit('refresh')"
+        >
+          <q-tooltip anchor="top middle" self="bottom middle">
+            Actualizar Datos
+          </q-tooltip>
+        </q-btn>
+
     <q-table
       flat
       bordered
@@ -52,9 +66,11 @@ const props = defineProps<{
   rowKey?: string
   dropdownIcon?: string
   rowsPerPageOptions?: number[]
+  refreshTooltip?: string
+  showRefresh?: boolean
 }>()
 
-const emit = defineEmits(['update:pagination'])
+const emit = defineEmits(['update:pagination', 'refresh'])
 
 
 const rowKey = props.rowKey ?? 'id'
@@ -64,8 +80,6 @@ const rowsPerPageOptions = props.rowsPerPageOptions ?? [5, 10, 20, 50]
 function onRequest (props: any) {
   emit('update:pagination', props.pagination)
 }
-
-
 </script>
 
 <style scoped>
@@ -136,4 +150,19 @@ function onRequest (props: any) {
   max-width: 120px;
 }
 
+.institucional-table :deep(.q-table__bottom .q-select) {
+  max-width: 50px;
+  min-width: 30px;
+}
+
+.institucional-table__top-actions {
+  display: flex;
+  justify-content: flex-start; /* o flex-start si prefieres alineado a la izquierda */
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.institucional-table__top-actions .q-btn {
+  font-size: 14px;
+  padding: 4px 10px;
+}
 </style>
