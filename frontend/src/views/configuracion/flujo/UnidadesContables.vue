@@ -1,10 +1,52 @@
 <template>
-  <div class="q-pa-md">
-    <h4>Gestión de Unidades Contables</h4>
-    <p>Este es el módulo de configuración de flujo para unidades contables.</p>
-  </div>
+  <InstitucionalTable
+    :columns="columns"
+    :rows="rows"
+    :loading="loading"
+    :rows-per-page-options="[5, 15, 25, 30, 50]"
+    :rows-per-page="pagination.rowsPerPage"
+    v-model:pagination="pagination"
+    :rows-number="totalCount"
+    :show-refresh="true"
+    refresh-tooltip="Actualizar Datos"
+    @refresh="refrescar"
+  >
+  </InstitucionalTable>
 </template>
 
+
 <script setup lang="ts">
-// Nada por ahora, solo contenido de prueba
+import InstitucionalTable from '@/components/InstitucionalTable.vue'
+import { ref, watch } from 'vue'
+import { useUnidades} from '@/composables/useUnidades'
+
+
+const pagination = ref({ page: 1, rowsPerPage: 15 })
+
+const columns = [
+  { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true },
+  { name: 'nombre', label: 'Nombre', field: 'nombre', align: 'left', sortable: true },
+  { name: 'isEmpresa', label: 'Empresa', field: 'isEmpresa', align: 'center', sortable: true },
+  { name: 'isComercializadora', label: 'Comercializadora', field: 'is_comercializadora', align: 'center', sortable: true },
+  { name: 'activo', label: 'Activa', field: 'activo', align: 'center', sortable: true },
+]
+
+const { rows, loading, totalCount, refetch } = useUnidades({ pagination })
+
+function refrescar() {
+  console.log('🔁 Refrescando datos manualmente...')
+  loading.value = true
+
+  refetch().then(() => {
+    loading.value = false
+    console.log('✅ Datos actualizados')
+  }).catch((error) => {
+    loading.value = false
+    console.error('❌ Error al refrescar datos:', error)
+  })
+}
+
+watch(totalCount, (newTotal) => {
+  pagination.value.rowsNumber = newTotal
+})
 </script>

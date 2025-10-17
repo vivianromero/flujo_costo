@@ -1,5 +1,5 @@
 // 🔹 Este composable usa paginado local con limit 9999
-// 🔹 Asume que la cantidad de departamentos no supera ese valor
+// 🔹 Asume que la cantidad de unidades contables no supera ese valor
 // 🔹 Si se supera, los datos se truncarán silenciosamente
 
 import { ref, computed, watchEffect, watch, onMounted } from 'vue'
@@ -7,26 +7,27 @@ import type { Ref } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { gql } from 'graphql-tag'
 
-const GET_DEPARTAMENTOS = gql`
-  query GetDepartamentos($page: Int!, $limit: Int!, $centroId: ID, $activos: Boolean) {
-    departamentos(page: $page, limit: $limit, centroId: $centroId, activos: $activos) {
+const GET_UNIDADES = gql`
+  query GetUnidades($page: Int!, $limit: Int!, $codigo: String, $nombre: String, $activo: Boolean) {
+    unidades(page: $page, limit: $limit, codigo: $codigo, nombre: $nombre, activo: $activo) {
       items {
         id
         codigo
-        descripcion
-        centrocosto {
-          descripcion
-        }
+        nombre
+        isEmpresa
+        isComercializadora
+        activo
       }
       totalCount
     }
   }
 `
 
-export function useDepartamentosPaginado(options: {
+export function useUnidades(options: {
   pagination: Ref<{ page: number; rowsPerPage: number }>
-  centroId?: Ref<string | null>
-  activos?: Ref<boolean | null>
+  codigo?: Ref<string | null>
+  nombre?: Ref<string | null>
+  activo?: Ref<boolean | null>
 }) {
   const allRows = ref<any[]>([]) // 🔹 Todos los datos
   const rows = ref<any[]>([])    // 🔹 Página actual
@@ -37,22 +38,23 @@ export function useDepartamentosPaginado(options: {
 const variables = computed(() => ({
   page: 1,
   limit: 99999,
-  centroId: options.centroId?.value ?? null,
-  activos: options.activos?.value ?? null
+  codigo: options.codigo?.value ?? null,
+  nombre: options.nombre?.value ?? null,
+  activo: options.activo?.value ?? null
 }))
 
 
-  const { result, refetch } = useQuery(GET_DEPARTAMENTOS, variables, {
+  const { result, refetch } = useQuery(GET_UNIDADES, variables, {
     enabled: computed(() => !!variables.value),
     fetchPolicy: 'cache-first'
   })
 
   // 🔹 Forzar carga inicial al montar
 onMounted(() => {
-  if (result.value?.departamentos?.items?.length) {
+  if (result.value?.unidades?.items?.length) {
     console.log('✅ Datos ya disponibles al montar')
-    allRows.value = result.value.departamentos.items
-    totalCount.value = result.value.departamentos.totalCount
+    allRows.value = result.value.unidades.items
+    totalCount.value = result.value.unidades.totalCount
     loading.value = false
     paginate()
   } else {
@@ -71,7 +73,7 @@ onMounted(() => {
 
   // 🔹 Cuando llegan los datos, cachea y pagina
   watch(result, (data) => {
-    const items = data?.departamentos?.items ?? []
+    const items = data?.unidades?.items ?? []
     console.log('📦 Datos recibidos:', items.length, 'items')
     allRows.value = items
     totalCount.value = items.length

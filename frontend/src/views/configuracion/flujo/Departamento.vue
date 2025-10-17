@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import InstitucionalTable from '@/components/InstitucionalTable.vue'
 import { ref, watch } from 'vue'
-import { useDepartamentosPaginado } from '@/composables/useDepartamentosPaginado'
+import { useDepartamentos} from '@/composables/useDepartamentos'
 
 
 const pagination = ref({ page: 1, rowsPerPage: 15 })
@@ -35,7 +35,7 @@ const columns = [
   }
 ]
 
-const { rows, loading, totalCount, refetch } = useDepartamentosPaginado({ pagination })
+const { rows, loading, totalCount, refetch } = useDepartamentos({ pagination })
 
 function refrescar() {
   console.log('🔁 Refrescando datos manualmente...')
@@ -54,8 +54,6 @@ function refrescar() {
 watch(totalCount, (newTotal) => {
   pagination.value.rowsNumber = newTotal
 })
-
-
 </script>
 
 

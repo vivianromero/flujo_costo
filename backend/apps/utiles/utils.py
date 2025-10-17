@@ -108,6 +108,10 @@ def message_warning(request, title, text):
         persistent=_("Close"),
     )
 
+def paginate_queryset(qs, page, limit):
+    total = qs.count()
+    offset = (page - 1) * limit
+    return qs[offset:offset + limit], total
 
 # def json_response(message=None, success=True, **data):
 #     """
