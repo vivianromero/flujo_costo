@@ -31,12 +31,9 @@ console.log('🎯 CrudView props:', props)
 const rows = ref<any[]>([])
 const loading = ref(true)
 
-// 🔹 Carga con Apollo - USAR onResult en lugar de watch
+// 🔹 Carga con Apollo - USAR onResult
 const { result, refetch, loading: apolloLoading, onResult } = useQuery(props.query)
 
-console.log('🚀 Apollo query iniciada')
-
-// 🔹 CORREGIDO: Usar onResult en lugar de watch
 onResult((queryResult) => {
   console.log('🎯 onResult triggered:', queryResult)
 

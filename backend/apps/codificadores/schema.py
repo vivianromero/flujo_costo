@@ -20,22 +20,35 @@ class DepartamentoType(DjangoObjectType):
         fields = ("id", "codigo", "descripcion", "centrocosto")
 
 class UnidadContableType(DjangoObjectType):
+    is_empresa_display = graphene.String()
+    is_comercializadora_display = graphene.String()
+    activo_display = graphene.String()
     class Meta:
         model = UnidadContable
         fields = ("id", "codigo", "nombre", "is_empresa", "is_comercializadora", "activo")
+
+    def resolve_is_empresa_display(self, info):
+        return '🏢 Empresa' if self.is_empresa else ''
+
+
+    def resolve_is_comercializadora_display(self, info):
+        return "💰 Comercializadora" if self.is_comercializadora else ""
+
+    def resolve_activo_display(self, info):
+        return "✅ Activa" if self.activo else "❌ Inactiva"
 
 
 # =====================================================
 #  CONNECTION
 # =====================================================
 class PaginatedType(graphene.ObjectType):
-    items = graphene.List(graphene.GenericScalar)  # se sobrescribe luego
+    items = graphene.List(graphene.JSONString)
     total_count = graphene.Int()
 
 class UnidadContableConnection(PaginatedType):
     items = graphene.List(UnidadContableType)
 
-class DepartamentoConnection(graphene.ObjectType):
+class DepartamentoConnection(PaginatedType):
     items = graphene.List(DepartamentoType)
 
 # =====================================================
