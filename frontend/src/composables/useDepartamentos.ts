@@ -16,6 +16,7 @@ const GET_DEPARTAMENTOS = gql`
         codigo
         descripcion
         centrocosto {
+          clave
           descripcion
         }
       }
