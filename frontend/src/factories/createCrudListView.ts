@@ -112,14 +112,14 @@ export function createCrudListView(
         {
           name: 'edit',
           icon: 'fa-solid fa-edit',
-          color: 'secondary',
+          color: 'primary',
           tooltip: 'Editar',
           visible: !noEdit // 🔥 MOSTRAR SI noEdit ES FALSE
         },
         {
           name: 'delete',
           icon: 'fa-solid fa-trash',
-          color: 'negative',
+          color: 'primary',
           tooltip: 'Eliminar',
           visible: !noDelete // 🔥 MOSTRAR SI noDelete ES FALSE
         }
