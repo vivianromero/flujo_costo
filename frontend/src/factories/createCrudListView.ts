@@ -97,9 +97,6 @@ export function createCrudListView(
 
       const { rowsPerPageOptions = [5, 15, 25, 30, 50] } = options
 
-      console.log('Edit create:', noEdit)
-      console.log('Delete create:', noDelete)
-
       // 🔥 ACCIONES POR DEFECTO FILTRADAS SEGÚN LAS FLAGS
       const defaultActions: TableAction[] = [
         {
@@ -112,14 +109,14 @@ export function createCrudListView(
         {
           name: 'edit',
           icon: 'fa-solid fa-edit',
-          color: 'primary',
+          color: 'secondary',
           tooltip: 'Editar',
           visible: !noEdit // 🔥 MOSTRAR SI noEdit ES FALSE
         },
         {
           name: 'delete',
           icon: 'fa-solid fa-trash',
-          color: 'primary',
+          color: 'negative',
           tooltip: 'Eliminar',
           visible: !noDelete // 🔥 MOSTRAR SI noDelete ES FALSE
         }
