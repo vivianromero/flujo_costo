@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Departamento, CentroCosto, UnidadContable
+from .models import *
 from apps.utiles.utils import paginate_queryset
 
 
@@ -20,23 +20,20 @@ class DepartamentoType(DjangoObjectType):
         fields = ("id", "codigo", "descripcion", "centrocosto")
 
 class UnidadContableType(DjangoObjectType):
-    is_empresa_display = graphene.String()
-    is_comercializadora_display = graphene.String()
-    activo_display = graphene.String()
     class Meta:
         model = UnidadContable
         fields = ("id", "codigo", "nombre", "is_empresa", "is_comercializadora", "activo")
 
-    def resolve_is_empresa_display(self, info):
-        return '🏢 Empresa' if self.is_empresa else ''
+class MedidaType(DjangoObjectType):
+    class Meta:
+        model = Medida
+        fields = ("id", "clave", "descripcion", "activa")
 
 
-    def resolve_is_comercializadora_display(self, info):
-        return "💰 Comercializadora" if self.is_comercializadora else ""
-
-    def resolve_activo_display(self, info):
-        return "✅ Activa" if self.activo else "❌ Inactiva"
-
+class MedidaConversionType(DjangoObjectType):
+    class Meta:
+        model = MedidaConversion
+        fields = ("id", "factor_conversion", "medidao", "medidad")
 
 # =====================================================
 #  CONNECTION
@@ -50,6 +47,12 @@ class UnidadContableConnection(PaginatedType):
 
 class DepartamentoConnection(PaginatedType):
     items = graphene.List(DepartamentoType)
+
+class MedidaConnection(PaginatedType):
+    items = graphene.List(MedidaType)
+
+class MedidaConversionConnection(PaginatedType):
+    items = graphene.List(MedidaConversionType)
 
 # =====================================================
 #  QUERIES
@@ -72,6 +75,15 @@ class CodificadoresQuery(graphene.ObjectType):
         codigo=graphene.String(),
         nombre=graphene.String(),
         activo=graphene.Boolean()
+    )
+
+    medidas = graphene.Field(
+        MedidaConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        clave=graphene.String(),
+        descripcion=graphene.String(),
+        activa=graphene.Boolean()
     )
 
     def resolve_departamentos(root, info, page, limit, centro_id=None, centroActivo=None):
@@ -103,6 +115,21 @@ class CodificadoresQuery(graphene.ObjectType):
 
         items, total = paginate_queryset(qs, page, limit)
         return UnidadContableConnection(items=items, total_count=total)
+
+    def resolve_medidas(root, info, page, limit, clave=None, descripcion=None, activa=None):
+        qs = Medida.objects.all()
+
+        if clave:
+            qs = qs.filter(clave=clave)
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
+
+        if activa is not None:
+            qs = qs.filter(activa=activa)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
 
 # =====================================================
 #  MUTATIONS

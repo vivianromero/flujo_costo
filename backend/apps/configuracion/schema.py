@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 class UnidadContableType(DjangoObjectType):
     class Meta:
         model = UnidadContable
-        fields = ("id", "codigo", "nombre")  # ← puedes agregar más campos luego
+        fields = ("id", "codigo", "nombre")
 
 class UserUebType(DjangoObjectType):
     ueb = graphene.String()

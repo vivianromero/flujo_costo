@@ -1,28 +1,26 @@
 // 🔹 Este composable usa paginado local con limit 9999
-// 🔹 Asume que la cantidad de unidades contables no supera ese valor
+// 🔹 Asume que la cantidad de unidades de medida no supera ese valor
 // 🔹 Si se supera, los datos se truncarán silenciosamente
 import { computed } from 'vue'
 import type { Ref } from 'vue'
 import { useSmartPagination } from '@/composables/useSmartPagination'
 import { gql } from 'graphql-tag'
 
-const GET_UNIDADES = gql`
-  query GetUnidades($page: Int!, $limit: Int!, $codigo: String, $nombre: String, $activo: Boolean) {
-    unidades(page: $page, limit: $limit, codigo: $codigo, nombre: $nombre, activo: $activo) {
+const GET_MEDIDAS = gql`
+  query GetMedidas($page: Int!, $limit: Int!, $clave: String, $descripcion: String, $activa: Boolean) {
+    medidas(page: $page, limit: $limit, clave: $clave, descripcion: $descripcion, activa: $activa) {
       items {
         id
-        codigo
-        nombre
-        isComercializadora
-        isEmpresa
-        activo
+        clave
+        descripcion
+        activa
       }
       totalCount
     }
   }
 `
 
-export function useUnidades(options: {
+export function useMedidas(options: {
   pagination: Ref<{ page: number; rowsPerPage: number; sortBy?: string; descending?: boolean }>
   codigo?: Ref<string | null>
   nombre?: Ref<string | null>
@@ -32,13 +30,13 @@ export function useUnidades(options: {
   const variables = computed(() => ({
     page: 1,
     limit: 99999,
-    codigo: options.codigo?.value ?? null,
-    nombre: options.nombre?.value ?? null,
-    activo: options.activo?.value ?? null
+    clave: options.clave?.value ?? null,
+    descripcion: options.descripcion?.value ?? null,
+    activa: options.activa?.value ?? null
   }))
 
   const smartPagination = useSmartPagination({
-    query: GET_UNIDADES,
+    query: GET_MEDIDAS,
     variables,
     pagination: options.pagination,
     columns: options.columns // 🔥 Pasar las columns para ordenamiento inteligente

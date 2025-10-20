@@ -53,7 +53,6 @@ export function useSmartPagination(options: {
 
   const { result, refetch, onResult, onError } = useQuery(options.query, options.variables, {
     fetchPolicy: 'cache-first'
-
   })
 
   // 🔥 MANEJO DE ERRORES
