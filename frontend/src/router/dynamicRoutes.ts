@@ -72,8 +72,6 @@ export function registerDynamicRoutes(router: Router, menuItems: any[]) {
   } catch (err) {
     console.warn('⚠️ No se pudo guardar el menú dinámico en localStorage:', err)
   }
-
-  console.log('✅ Rutas dinámicas registradas dentro del layout:', routes)
   return routes
 }
 
@@ -94,7 +92,6 @@ export function restoreDynamicRoutes(router: Router, session: ReturnType<typeof 
 
     const menuItems = JSON.parse(saved)
     registerDynamicRoutes(router, menuItems)
-    console.log('🔁 Rutas dinámicas restauradas desde localStorage')
   } catch (err) {
     console.error('❌ Error al restaurar rutas dinámicas:', err)
   }

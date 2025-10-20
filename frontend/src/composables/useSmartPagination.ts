@@ -53,6 +53,7 @@ export function useSmartPagination(options: {
 
   const { result, refetch, onResult, onError } = useQuery(options.query, options.variables, {
     fetchPolicy: 'cache-first'
+
   })
 
   // 🔥 MANEJO DE ERRORES
@@ -65,8 +66,6 @@ export function useSmartPagination(options: {
   function extractData(data: any): { items: any[], totalCount: number } {
     if (!data) return { items: [], totalCount: 0 }
 
-    console.log('📊 Datos recibidos de GraphQL:', data)
-
     // Buscar en diferentes estructuras comunes
     const dataKeys = Object.keys(data)
 
@@ -76,10 +75,6 @@ export function useSmartPagination(options: {
       // Si tiene estructura { items: [], totalCount: number }
       if (entityData && typeof entityData === 'object') {
         if (Array.isArray(entityData.items) && typeof entityData.totalCount === 'number') {
-          console.log(`✅ Encontrados datos en: ${key}`, {
-            itemsCount: entityData.items.length,
-            totalCount: entityData.totalCount
-          })
           return {
             items: entityData.items,
             totalCount: entityData.totalCount
@@ -88,9 +83,6 @@ export function useSmartPagination(options: {
 
         // Si es un array directo
         if (Array.isArray(entityData)) {
-          console.log(`✅ Encontrado array directo en: ${key}`, {
-            itemsCount: entityData.length
-          })
           return {
             items: entityData,
             totalCount: entityData.length
@@ -169,38 +161,21 @@ export function useSmartPagination(options: {
     const start = (page - 1) * rowsPerPage
     const end = start + rowsPerPage
     rows.value = list.slice(start, end)
-
-    console.log('📄 Paginación aplicada:', {
-      total: allRows.value.length,
-      page,
-      rowsPerPage,
-      start,
-      end,
-      rowsCount: rows.value.length
-    })
   }
 
   // 🔥 MANEJO DE DATOS MEJORADO
   function processData(data: any) {
-    console.log('🔄 Procesando datos...')
     const { items, totalCount: count } = extractData(data)
 
     allRows.value = items
     totalCount.value = count
     loading.value = false
 
-    console.log('✅ Datos procesados:', {
-      itemsCount: items.length,
-      totalCount: count,
-      loading: loading.value
-    })
-
-    paginate()
+     paginate()
   }
 
   // 📥 WATCHERS Y MOUNTED
   onMounted(() => {
-    console.log('🏁 Composable montado')
     if (result.value) {
       processData(result.value)
     } else {
@@ -210,11 +185,6 @@ export function useSmartPagination(options: {
 
   // Usar onResult para mejor control
   onResult((queryResult) => {
-    console.log('🎯 onResult triggered:', {
-      loading: queryResult.loading,
-      data: !!queryResult.data,
-      error: !!queryResult.error
-    })
 
     if (queryResult.data) {
       processData(queryResult.data)
@@ -224,7 +194,6 @@ export function useSmartPagination(options: {
   })
 
   watch(() => options.pagination.value, () => {
-    console.log('🔄 Paginación cambió:', options.pagination.value)
     paginate()
   }, { deep: true })
 

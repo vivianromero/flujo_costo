@@ -525,6 +525,7 @@ class Departamento(ObjectsManagerAbstract):
                                                    blank=True,
                                                    related_name='departamento_documentossalida',
                                                    verbose_name=_("Documentos de Salida"))
+    es_almacen = models.BooleanField(default=False, verbose_name=_("Es Almacén"))
 
     class Meta:
         db_table = 'cla_departamento'

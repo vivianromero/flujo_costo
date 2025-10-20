@@ -90,6 +90,10 @@ async function login() {
         me {
           username
           ueb
+          isAdminempresa
+          isOperflujo
+          isOpercosto
+          isAdmin
         }
       }
     `
@@ -105,9 +109,16 @@ async function login() {
     const resMeJson = await resMe.json()
     const name = resMeJson?.data?.me?.username || 'Usuario'
     const unidad = resMeJson?.data?.me?.ueb || 'Unidad'
+    const isOperflujo = resMeJson?.data?.me?.isOperflujo || false
+    const isOpercosto = resMeJson?.data?.me?.isOpercosto || false
+    const isAdminempresa = resMeJson?.data?.me?.isAdminempresa || false
+    const isAdmin = resMeJson?.data?.me?.isAdmin || false
+
+    console.log('isAdmin Login:', isAdmin)
+    console.log('isAdminempresa Login:', isAdminempresa)
 
     // 3. Delegar a useAuth
-    auth.login(token, name, unidad)
+    auth.login(token, name, unidad, isAdmin, isAdminempresa, isOperflujo, isOpercosto)
     router.push({ name: 'home' })
   } catch (e) {
     error.value = 'Error de red o servidor: ' + String(e)

@@ -7,7 +7,7 @@
       virtual-scroll
       :virtual-scroll-sticky-size-start="60"
       :rows="rows"
-      :columns="columns"
+      :columns="processedColumns"
       :row-key="rowKey"
       :loading="loading"
       :rows-per-page-options="rowsPerPageOptions"
@@ -19,23 +19,74 @@
       @request="onRequest"
       :rows-number="props.rowsNumber"
     >
-      <!-- 🔹 Encabezados personalizados -->
+      <!-- 🔹 Encabezados personalizados CON REDIMENSIONADO -->
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th
             v-for="col in props.cols"
             :key="col.name"
             :props="props"
-            class="institucional-table__header"
+            class="institucional-table__header resizable-column"
+            :style="getColumnStyle(col.name)"
+            @mousedown="startResize(col.name, $event)"
           >
             {{ col.label }}
+            <div
+              class="column-resize-handle"
+              @mousedown.stop="startResize(col.name, $event)"
+            ></div>
           </q-th>
+        </q-tr>
+      </template>
+
+      <!-- 🔹 Cuerpo de la tabla con acciones -->
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props"
+          >
+            <!-- 🔥 COLUMNA DE ACCIONES -->
+            <template v-if="col.name === 'actions' && showActions">
+              <div class="actions-container">
+                <!-- Slot para acciones personalizadas -->
+                <slot
+                  name="actions"
+                  :row="props.row"
+                  :actions="getRowActions(props.row)"
+                >
+                  <!-- Acciones por defecto -->
+                  <template v-for="action in getRowActions(props.row)" :key="action.name">
+                    <q-btn
+                      v-if="isActionVisible(action, props.row)"
+                      flat
+                      dense
+                      round
+                      size="xs"
+                      :icon="action.icon"
+                      :color="action.color"
+                      @click="emitAction(action.name, props.row)"
+                      class="action-btn"
+                    >
+                      <q-tooltip>{{ action.tooltip }}</q-tooltip>
+                    </q-btn>
+                  </template>
+                </slot>
+              </div>
+            </template>
+
+            <!-- 🔥 COLUMNAS NORMALES -->
+            <template v-else>
+              {{ col.value }}
+            </template>
+          </q-td>
         </q-tr>
       </template>
 
       <!-- 🔹 Slot bottom con padding reducido -->
       <template v-slot:bottom>
-        <div class="row full-width items-center justify-between" style="padding: 0px 10px 0px 10px;">
+        <div class="row full-width items-center justify-between" style="padding: 0px 5px 0px 5px;">
           <!-- 🔄 Botón de refresh a la izquierda -->
           <div class="col-auto" style="background-color:blue;">
             <q-btn
@@ -67,7 +118,7 @@
                   :model-value="props.pagination.rowsPerPage"
                   @update:model-value="onRowsPerPageChange"
                   :options="rowsPerPageOptions"
-                  style="min-width: 35px; padding-right:10px; "
+                  style="min-width: 35px; padding-right:10px;"
                   emit-value
                   map-options
                   dropdown-icon="fas fa-caret-down"
@@ -119,13 +170,28 @@
           </div>
         </div>
       </template>
+
+      <!-- Slot de loading -->
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
+      </template>
     </q-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import type { QTableColumn } from 'quasar'
+
+// 🔥 INTERFACE PARA ACCIONES
+interface TableAction {
+  name: string
+  icon: string
+  color: string
+  tooltip: string
+  visible?: boolean | ((row: any) => boolean)
+  condition?: (row: any) => boolean
+}
 
 const props = defineProps<{
   columns: QTableColumn[]
@@ -141,13 +207,151 @@ const props = defineProps<{
   rowsPerPageOptions?: number[]
   refreshTooltip?: string
   showRefresh?: boolean
+  // 🔥 NUEVAS PROPS PARA ACCIONES
+  showActions?: boolean
+  actions?: TableAction[]
 }>()
 
-const emit = defineEmits(['update:pagination', 'refresh'])
+// 🔥 EMITS ACTUALIZADOS
+const emit = defineEmits([
+  'update:pagination',
+  'refresh',
+  'action' // 🔥 NUEVO EMIT UNIFICADO
+])
 
 const rowKey = props.rowKey ?? 'id'
 const dropdownIcon = props.dropdownIcon ?? 'fa fa-chevron-down'
 const rowsPerPageOptions = props.rowsPerPageOptions ?? [5, 10, 20, 50]
+
+// 🔥 VALORES POR DEFECTO PARA ACCIONES
+const showActions = props.showActions ?? true
+const actions = props.actions ?? []
+
+// 🔥 ESTADO PARA REDIMENSIONADO
+const columnWidths = ref<Record<string, number>>({})
+const isResizing = ref(false)
+const currentResizeColumn = ref<string | null>(null)
+const startX = ref(0)
+const startWidth = ref(0)
+
+// 🔥 COLUMNAS PROCESADAS CON ANCHOS (FILTRAR ACCIONES SI NO SE MUESTRAN)
+const processedColumns = computed(() => {
+  let columnsToProcess = props.columns
+
+  // Si showActions es false, filtrar la columna actions
+  if (!showActions) {
+    columnsToProcess = props.columns.filter(col => col.name !== 'actions')
+  }
+
+  return columnsToProcess.map(col => ({
+    ...col,
+    style: getColumnStyle(col.name),
+    classes: 'resizable-column'
+  }))
+})
+
+// 🔥 INICIALIZAR ANCHOS
+onMounted(() => {
+  processedColumns.value.forEach(col => {
+    if (!columnWidths.value[col.name]) {
+      columnWidths.value[col.name] = getDefaultWidth(col)
+    }
+  })
+})
+
+// 🔥 OBTENER ANCHO POR DEFECTO GENÉRICO
+function getDefaultWidth(col: QTableColumn): number {
+  // 🔥 ANCHO FIJO PARA ACCIONES
+  if (col.name === 'actions') return 120
+
+  const labelLength = col.label?.length || 0
+  const fieldType = typeof col.field
+
+  if (labelLength <= 5) return 100
+  if (labelLength <= 10) return 150
+  if (labelLength <= 15) return 180
+  if (labelLength > 15) return 220
+
+  if (fieldType === 'function') return 200
+  if (col.align === 'center') return 120
+
+  return 160
+}
+
+// 🔥 INICIAR REDIMENSIONADO
+function startResize(columnName: string, event: MouseEvent) {
+  isResizing.value = true
+  currentResizeColumn.value = columnName
+  startX.value = event.clientX
+  startWidth.value = columnWidths.value[columnName]
+
+  document.addEventListener('mousemove', handleResize)
+  document.addEventListener('mouseup', stopResize)
+  document.body.style.cursor = 'col-resize'
+  document.body.style.userSelect = 'none'
+
+  event.preventDefault()
+}
+
+// 🔥 MANEJAR REDIMENSIONADO
+function handleResize(event: MouseEvent) {
+  if (!isResizing.value || !currentResizeColumn.value) return
+
+  const deltaX = event.clientX - startX.value
+  const newWidth = Math.max(80, startWidth.value + deltaX) // Mínimo 80px
+
+  columnWidths.value[currentResizeColumn.value] = newWidth
+}
+
+// 🔥 DETENER REDIMENSIONADO
+function stopResize() {
+  isResizing.value = false
+  currentResizeColumn.value = null
+
+  document.removeEventListener('mousemove', handleResize)
+  document.removeEventListener('mouseup', stopResize)
+  document.body.style.cursor = ''
+  document.body.style.userSelect = ''
+}
+
+// 🔥 OBTENER ESTILO PARA COLUMNA
+function getColumnStyle(columnName: string) {
+  const width = columnWidths.value[columnName] || getDefaultWidth(props.columns.find(c => c.name === columnName)!)
+  return {
+    width: `${width}px`,
+    minWidth: columnName === 'actions' ? '120px' : '80px',
+    maxWidth: '500px',
+    position: 'relative'
+  }
+}
+
+// 🔥 LIMPIAR EVENT LISTENERS
+onUnmounted(() => {
+  document.removeEventListener('mousemove', handleResize)
+  document.removeEventListener('mouseup', stopResize)
+})
+
+// 🔥 FUNCIONES PARA MANEJAR ACCIONES
+const getRowActions = (row: any) => {
+  return actions.filter(action => {
+    // Si tiene condición, evaluarla
+    if (action.condition && typeof action.condition === 'function') {
+      return action.condition(row)
+    }
+    return true
+  })
+}
+
+const isActionVisible = (action: TableAction, row: any) => {
+  if (typeof action.visible === 'function') {
+    return action.visible(row)
+  }
+  return action.visible !== false
+}
+
+const emitAction = (actionName: string, row: any) => {
+  emit('action', { action: actionName, row })
+}
 
 // 🔹 Computed para información de paginación
 const paginationInfo = computed(() => {
@@ -291,5 +495,36 @@ function onRequest(propsRequest: any) {
 
 :deep(.my-sticky-virtscroll-table ::-webkit-scrollbar-thumb:hover) {
   background: #6c757d;
+ }
+
+
+.actions-container {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  margin: 0 2px;
+}
+
+.column-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background-color 0.2s;
+}
+
+.column-resize-handle:hover {
+  background-color: #ccc;
+}
+
+.resizable-column {
+  position: relative;
 }
 </style>

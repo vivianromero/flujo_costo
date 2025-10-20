@@ -1,6 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { createCrudListView } from '@/factories/createCrudListView'
 import { useDepartamentos } from '@/composables/useDepartamentos'
+import { useSessionStore } from '@/stores/session'
+import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
+
+const session = useSessionStore()
 
 const columns = [
   { name: 'codigo', label: 'Código', field: 'codigo', align: 'left', sortable: true, width: '100px' },
@@ -11,10 +15,8 @@ const columns = [
     field: row => {
         const centro = row.centrocosto
         if (!centro) return 'Sin centro'
-
-        const clave = centro.clave || 'S/C'  // S/C = Sin Código
+        const clave = centro.clave || 'S/C'
         const descripcion = centro.descripcion || 'Sin descripción'
-
         return `${clave} | ${descripcion}`
       },
     align: 'left',
@@ -23,8 +25,19 @@ const columns = [
   }
 ]
 
-export default createCrudListView(useDepartamentos, columns)
+const CrudComponent = createCrudListView(useDepartamentos, columns, {
+  showActions: true,
+  noEdit: !session.isAdminempresa,
+  noDelete: !session.isAdminempresa,
+  onAction: (action, row) => {
+    console.log(`Acción ${action} en departamento:`, row)
+  }
+})
 </script>
+
+<template>
+  <BaseCrudView :component="CrudComponent" />
+</template>
 
 
 

@@ -64,12 +64,8 @@ onMounted(async () => {
     })
     const data = await response.json()
 
-    console.log('[Menu] 📦 Datos recibidos del backend:', data)
-
     menu.value = data
     menuStore.setMenu(menu.value)
-
-    console.log('[Menu] ✅ Guardado en Pinia:', menuStore.items)
 
     // ✅ Registra rutas dinámicas basadas en el menú
     registerDynamicRoutes(router, menuStore.items)
