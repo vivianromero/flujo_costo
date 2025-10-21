@@ -8,25 +8,19 @@ import { restoreDynamicRoutes } from './router/dynamicRoutes'
 import { useMenuStore } from '@/stores/menu'
 import { useSessionGuard } from '@/utils/useSessionGuard'
 
-// Quasar core
+// Quasar core - IMPORTAR CORRECTAMENTE
 import { Quasar } from 'quasar'
 import quasarLang from 'quasar/lang/es'
+
+// Importar estilos CORRECTOS
 import 'quasar/dist/quasar.css'
 import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
 import '@/assets/css/institucional.css'
-
-// Componentes manuales si no usas auto-import
-import {
-  QLayout, QHeader, QDrawer, QPageContainer, QFooter,
-  QToolbar, QToolbarTitle, QBtn, QAvatar, QIcon,
-  QItem, QItemSection, QList, QCard, QCardSection,
-  QBreadcrumbs, QBreadcrumbsEl
-} from 'quasar'
+import iconSet from 'quasar/icon-set/fontawesome-v6'
 
 const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
-
 
 const menuStore = useMenuStore()
 restoreDynamicRoutes(router, menuStore)
@@ -36,15 +30,13 @@ app.provide(DefaultApolloClient, apolloClient)
 
 app.use(router)
 
+// Configuración Quasar
 app.use(Quasar, {
-  components: {
-    QLayout, QHeader, QDrawer, QPageContainer, QFooter,
-    QToolbar, QToolbarTitle, QBtn, QAvatar, QIcon,
-    QItem, QItemSection, QList, QCard, QCardSection,
-    QBreadcrumbs, QBreadcrumbsEl
-  },
-  lang: quasarLang
+  plugins: {},
+  lang: quasarLang,
+  iconSet
 })
+
 
 app.mount('#app')
 

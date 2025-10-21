@@ -96,6 +96,9 @@ import Menu from '@/components/Menu.vue'
 import { useSessionStore } from '@/stores/session'
 import { useMenuStore } from '@/stores/menu'
 import Footer from '@/components/Footer.vue'
+import { apolloClient } from '@/apollo/client'
+import { createCrudListView } from '@/factories/createCrudListView'
+
 
 /* ───────────────────────────────
    🔧 Estado y dependencias
@@ -147,6 +150,9 @@ function startResize(e: MouseEvent) {
    🔐 Logout
 ──────────────────────────────── */
 function logout() {
+  if (apolloClient) {
+    apolloClient.clearStore()
+  }
   session.token = null
   sessionStorage.clear()
   session.clearSession()

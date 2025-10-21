@@ -19,13 +19,15 @@ from django.urls import path, include
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from api.schema import schema
+
 
 def inicio(request):
     return HttpResponse("Página principal funcionando")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
     path('codificadores/', include('apps.codificadores.urls')),
     path('configuracion/', include('apps.configuracion.urls')),
     path('api/', include('apps.common.urls')),

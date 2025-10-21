@@ -38,7 +38,6 @@ function goHome() {
   router.push('/')
 }
 
-console.log('[FallbackView] Renderizado correctamente')
 </script>
 
 
