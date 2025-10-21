@@ -1,5 +1,25 @@
 <template>
   <div class="institucional-table q-pa-md">
+    <div v-if="showTopActions && topActions.length > 0" class="top-actions-container row justify-end items-center q-mb-md">
+      <div class="top-actions row justify-end">
+        <q-btn
+          v-for="action in topActions"
+          :key="action.name"
+          :icon="action.icon"
+          :color="action.color"
+          @click="$emit('topAction', action.name)"
+          flat
+          dense
+          round
+          size="sm"
+          class="top-action-btn"
+        >
+          <q-tooltip anchor="top middle" self="bottom middle">
+            {{ action.tooltip }}
+          </q-tooltip>
+        </q-btn>
+      </div>
+    </div>
     <q-table
       flat
       bordered
@@ -210,13 +230,15 @@ const props = defineProps<{
   // 🔥 NUEVAS PROPS PARA ACCIONES
   showActions?: boolean
   actions?: TableAction[]
+  showTopActions?: boolean
+  topActions?: any[]
 }>()
 
-// 🔥 EMITS ACTUALIZADOS
 const emit = defineEmits([
   'update:pagination',
   'refresh',
-  'action' // 🔥 NUEVO EMIT UNIFICADO
+  'action',
+  'topAction'
 ])
 
 const rowKey = props.rowKey ?? 'id'
@@ -527,4 +549,34 @@ function onRequest(propsRequest: any) {
 .resizable-column {
   position: relative;
 }
+
+.top-actions-container {
+  min-height: 5px;
+  padding: 0px 0px 0px 0px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 20px;
+}
+
+.top-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  gap: 20px;
+}
+
+.top-action-btn {
+  margin: 0;
+  width: 5px;
+  height: 5px;
+}
+
+/* Efecto hover sutil */
+.top-action-btn:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
 </style>

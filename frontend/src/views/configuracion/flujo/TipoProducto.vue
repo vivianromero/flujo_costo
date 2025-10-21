@@ -16,6 +16,9 @@ const CrudComponent = createCrudListView(useTiposProductos, columns, {
   noEdit: !session.isAdminempresa,
   noDelete: true,
   noView: true,
+  noFetchFromSystem: true,
+  noExport: !session.isAdminempresa,
+  noCreate: true,
   onAction: (action, row) => {
     console.log(`Acción ${action} en tipos de productos:`, row)
   }

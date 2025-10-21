@@ -21,16 +21,17 @@
  * Composable (datos) + Columnas (UI) = Vista CRUD Completa
  */
 
-import { defineComponent, h, ref, watch } from 'vue'
+import { defineComponent, h, ref, watch, computed } from 'vue'
 import InstitucionalTable from '@/components/InstitucionalTable.vue'
 
-interface TableAction {
+
+interface TopAction {
   name: string
+  label: string
   icon: string
   color: string
-  tooltip: string
-  visible?: boolean | ((row: any) => boolean)
-  condition?: (row: any) => boolean
+  visible?: boolean | (() => boolean)
+  condition?: () => boolean
 }
 
 interface CrudOptions {
@@ -43,6 +44,17 @@ interface CrudOptions {
   noView?: boolean
   noEdit?: boolean
   noDelete?: boolean
+
+  showTopActions?: boolean
+  customTopActions?: TopAction[]
+  onTopAction?: (action: string) => void
+
+  noFetchFromSystem?: boolean
+  noCreate?: boolean
+  noExport?: boolean
+  noImport?: boolean
+  noExportExcel?: boolean
+  tooltipFetchFromSystem?: string
 }
 
 export function createCrudListView(
@@ -60,7 +72,16 @@ export function createCrudListView(
         onAction,
         noView = false,
         noEdit = false,
-        noDelete = false
+        noDelete = false,
+        showTopActions = true,
+        customTopActions,
+        onTopAction,
+        noFetchFromSystem = false,
+        noCreate = false,
+        noExport = false,
+        noImport = false,
+        noExportExcel = false,
+        tooltipFetchFromSystem = 'Actualizar desde otro sistema'
       } = options
 
       const pagination = ref({ page: 1, rowsPerPage: rowsPerPage })
@@ -104,21 +125,21 @@ export function createCrudListView(
           icon: 'fa-solid fa-eye',
           color: 'primary',
           tooltip: 'Ver detalles',
-          visible: !noView // 🔥 MOSTRAR SI noView ES FALSE
+          visible: !noView
         },
         {
           name: 'edit',
           icon: 'fa-solid fa-edit',
           color: 'secondary',
           tooltip: 'Editar',
-          visible: !noEdit // 🔥 MOSTRAR SI noEdit ES FALSE
+          visible: !noEdit
         },
         {
           name: 'delete',
           icon: 'fa-solid fa-trash',
           color: 'negative',
           tooltip: 'Eliminar',
-          visible: !noDelete // 🔥 MOSTRAR SI noDelete ES FALSE
+          visible: !noDelete
         }
       ]
 
@@ -158,6 +179,85 @@ export function createCrudListView(
         }
       }
 
+      const defaultTopActions: TopAction[] = [
+
+       {
+         name: 'fetchFromSystem',
+         icon: 'fa-solid fa-database',
+         //color: 'primary',
+         color: 'grey-8',
+         tooltip: tooltipFetchFromSystem,
+         visible: !noFetchFromSystem
+       },
+       {
+         name: 'create',
+         icon: 'fa-solid fa-file-circle-plus',
+         //color: 'positive',
+         color: 'grey-8',
+         tooltip: 'Crear Nuevo Elemento',
+         visible: !noCreate
+       },
+       {
+         name: 'export',
+         icon: 'fa-solid fa-file-export',
+         //color: 'secondary',
+         color: 'grey-8',
+         tooltip: 'Exportar Datos',
+         visible: !noExport
+       },
+       {
+         name: 'import',
+         icon: 'fa-solid fa-file-import',
+         //color: 'info',
+         color: 'grey-8',
+         tooltip: 'Importar Datos',
+         visible: !noImport
+       },
+       {
+         name: 'exportexcel',
+         icon: 'fa-solid fa-file-excel',
+         color: 'grey-8',
+         tooltip: 'Exportar a excel',
+         visible: !noExportExcel
+       }
+     ]
+
+      const topActionsToUse = customTopActions || defaultTopActions
+
+      // 🔥 FILTRAR ACCIONES SUPERIORES VISIBLES
+      const visibleTopActions = computed(() => {
+        return topActionsToUse.filter(action => {
+          if (typeof action.visible === 'function') {
+            return action.visible()
+          }
+          return action.visible !== false
+        })
+      })
+
+      const handleTopAction = (actionName: string) => {
+        if (onTopAction) {
+          onTopAction(actionName)
+        } else {
+          // 🔥 COMPORTAMIENTO POR DEFECTO
+          switch (actionName) {
+            case 'fetchFromSystem':
+              console.log('Traer datos desde Sistema X')
+              break
+            case 'create':
+              console.log('Crear nuevo elemento')
+              break
+            case 'export':
+              console.log('Exportar datos')
+              break
+            case 'import':
+              console.log('Importar datos')
+              break
+            default:
+              console.log(`Acción superior ${actionName}`)
+          }
+        }
+      }
+
       return () =>
         h(InstitucionalTable, {
           columns: tableColumns,
@@ -171,7 +271,10 @@ export function createCrudListView(
           rowsPerPageOptions,
           showActions,
           actions: actionsToUse,
-          onAction: handleAction
+          onAction: handleAction,
+          showTopActions,
+          topActions: visibleTopActions.value,
+          onTopAction: handleTopAction
         })
     },
   })

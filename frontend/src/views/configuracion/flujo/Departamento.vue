@@ -29,6 +29,9 @@ const CrudComponent = createCrudListView(useDepartamentos, columns, {
   showActions: true,
   noEdit: !session.isAdminempresa,
   noDelete: !session.isAdminempresa,
+  noFetchFromSystem: true,
+  noExport: !session.isAdminempresa,
+  noCreate: !session.isAdminempresa,
   onAction: (action, row) => {
     console.log(`Acción ${action} en departamento:`, row)
   }

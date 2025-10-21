@@ -37,6 +37,9 @@ const CrudComponent = createCrudListView(useMedidasConversion, columns, {
   noEdit: !session.isAdminempresa,
   noDelete: !session.isAdminempresa,
   noView: true,
+  noFetchFromSystem: true,
+  noExport: !session.isAdminempresa,
+  noCreate: !session.isAdminempresa,
   onAction: (action, row) => {
     console.log(`Acción ${action} en conversion de medidas:`, row)
   }

@@ -23,6 +23,10 @@ const CrudComponent = createCrudListView(useMedidas, columns, {
   noEdit: !session.isAdminempresa,
   noDelete: !session.isAdminempresa,
   noView: true,
+  noFetchFromSystem: !session.isAdminempresa,
+  tooltipFetchFromSystem: 'Actualizar desde Versat',
+  noExport: !session.isAdminempresa,
+  noCreate: true,
   onAction: (action, row) => {
     console.log(`Acción ${action} en medidas:`, row)
   }

@@ -22,6 +22,9 @@ const CrudComponent = createCrudListView(useMarcasSalida, columns, {
   noEdit: !session.isAdminempresa,
   noDelete: !session.isAdminempresa,
   noView: true,
+  noFetchFromSystem: true,
+  noExport: !session.isAdminempresa,
+  noCreate: !session.isAdminempresa,
   onAction: (action, row) => {
     console.log(`Acción ${action} en marcas de salida:`, row)
   }
