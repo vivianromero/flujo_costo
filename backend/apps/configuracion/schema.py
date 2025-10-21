@@ -1,13 +1,7 @@
 import graphene
 from graphql_jwt.decorators import login_required
-from apps.codificadores.models import UnidadContable
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth import get_user_model
-
-class UnidadContableType(DjangoObjectType):
-    class Meta:
-        model = UnidadContable
-        fields = ("id", "codigo", "nombre")
 
 class UserUebType(DjangoObjectType):
     ueb = graphene.String()

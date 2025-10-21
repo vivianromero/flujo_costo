@@ -181,8 +181,6 @@ class TipoProducto(models.Model):
     id = models.AutoField(primary_key=True, choices=ChoiceTiposProd.CHOICE_TIPOS_PROD, editable=False, )
     descripcion = models.CharField(unique=True, max_length=80)
     orden = models.SmallIntegerField(default=1)
-    contabilizacion = models.CharField(max_length=10, verbose_name='Elemento a contabilizar en Transf. Externas',
-                                       blank=True, null=True)
 
     contabilizacion = models.CharField(
         max_length=10,  # Ajusta la longitud máxima según tus necesidades

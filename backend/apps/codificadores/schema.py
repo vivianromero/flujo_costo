@@ -35,6 +35,31 @@ class MedidaConversionType(DjangoObjectType):
         model = MedidaConversion
         fields = ("id", "factor_conversion", "medidao", "medidad")
 
+class TipoDocumentoType(DjangoObjectType):
+    class Meta:
+        model = TipoDocumento
+        fields = ("id", "descripcion", "operacion", "generado", "prefijo")
+
+class TipoProductoType(DjangoObjectType):
+    class Meta:
+        model = TipoProducto
+        fields = ("id", "descripcion", "orden", "contabilizacion")
+
+class TipoHabilitacionType(DjangoObjectType):
+    class Meta:
+        model = TipoHabilitacion
+        fields = ("id", "descripcion", "activo")
+
+class MotivoAjusteType(DjangoObjectType):
+    class Meta:
+        model = MotivoAjuste
+        fields = ("id", "descripcion", "aumento", "activo")
+
+class MarcaSalidaType(DjangoObjectType):
+    class Meta:
+        model = MarcaSalida
+        fields = ("id", "codigo", "descripcion", "activa")
+
 # =====================================================
 #  CONNECTION
 # =====================================================
@@ -53,6 +78,21 @@ class MedidaConnection(PaginatedType):
 
 class MedidaConversionConnection(PaginatedType):
     items = graphene.List(MedidaConversionType)
+
+class TipoDocumentoConnection(PaginatedType):
+    items = graphene.List(TipoDocumentoType)
+
+class TipoProductoConnection(PaginatedType):
+    items = graphene.List(TipoProductoType)
+
+class TipoHabilitacionConnection(PaginatedType):
+    items = graphene.List(TipoHabilitacionType)
+
+class MotivoAjusteConnection(PaginatedType):
+    items = graphene.List(MotivoAjusteType)
+
+class MarcaSalidaConnection(PaginatedType):
+    items = graphene.List(MarcaSalidaType)
 
 # =====================================================
 #  QUERIES
@@ -86,6 +126,58 @@ class CodificadoresQuery(graphene.ObjectType):
         activa=graphene.Boolean()
     )
 
+    medidasconversion = graphene.Field(
+        MedidaConversionConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        medidao=graphene.String(),
+        medidad=graphene.String(),
+    )
+
+    tiposdocumentos = graphene.Field(
+        TipoDocumentoConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        descripcion=graphene.String(),
+        operacion=graphene.String(),
+        prefijo=graphene.String(),
+        generado=graphene.Boolean(),
+    )
+
+    tiposproductos = graphene.Field(
+        TipoProductoConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        descripcion=graphene.String(),
+        orden=graphene.Int(),
+        contabilizacion=graphene.String(),
+    )
+
+    tiposhabilitaciones = graphene.Field(
+        TipoHabilitacionConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        descripcion=graphene.String(),
+        activo=graphene.Boolean(),
+    )
+
+    motivosajuste = graphene.Field(
+        MotivoAjusteConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        descripcion=graphene.String(),
+        aumento=graphene.Boolean(),
+        activo=graphene.Boolean(),
+    )
+
+    marcassalida = graphene.Field(
+        MarcaSalidaConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        codigo=graphene.String(),
+        descripcion=graphene.String(),
+        activa=graphene.Boolean(),
+    )
     def resolve_departamentos(root, info, page, limit, centro_id=None, centroActivo=None):
         qs = Departamento.objects.select_related("centrocosto")
 
@@ -127,6 +219,88 @@ class CodificadoresQuery(graphene.ObjectType):
 
         if activa is not None:
             qs = qs.filter(activa=activa)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
+
+    def resolve_medidasconversion(root, info, page, limit, medidao=None, medidad=None):
+        qs = MedidaConversion.objects.all()
+
+        if medidao:
+            qs = qs.filter(medidao=medidao)
+
+        if medidad:
+            qs = qs.filter(medidad=medidad)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
+
+    def resolve_tiposdocumentos(root, info, page, limit, descripcion=None, operacion=None, prefijo=None, generado=None):
+        qs = TipoDocumento.objects.all()
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
+
+        if operacion:
+            qs = qs.filter(operacion=operacion)
+
+        if prefijo:
+            qs = qs.filter(prefijo__icontains=prefijo)
+
+        if generado:
+            qs = qs.filter(generado=generado)
+
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
+
+    def resolve_tiposproductos(root, info, page, limit, descripcion=None):
+        qs = TipoProducto.objects.all()
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
+
+    def resolve_tiposhabilitaciones(root, info, page, limit, descripcion=None, activo=None):
+        qs = TipoHabilitacion.objects.all()
+
+        if activo:
+            qs = qs.filter(activo=activo)
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
+
+    def resolve_motivosajuste(root, info, page, limit, descripcion=None, aumento=None, activo=None):
+        qs = MotivoAjuste.objects.all()
+
+        if activo:
+            qs = qs.filter(activo=activo)
+
+        if aumento:
+            qs = qs.filter(aumento=aumento)
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return MedidaConnection(items=items, total_count=total)
+
+    def resolve_marcassalida(root, info, page, limit, codigo=None, descripcion=None, activa=None):
+        qs = MarcaSalida.objects.all()
+
+        if activa:
+            qs = qs.filter(activa=activa)
+
+        if codigo:
+            qs = qs.filter(codigo__icontains=codigo)
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
 
         items, total = paginate_queryset(qs, page, limit)
         return MedidaConnection(items=items, total_count=total)

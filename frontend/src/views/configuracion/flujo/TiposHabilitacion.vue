@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createCrudListView } from '@/factories/createCrudListView'
-import { useMedidas } from '@/composables/useMedidas'
+import { useTiposHabilitaciones } from '@/composables/useTiposHabilitaciones'
 import { useSessionStore } from '@/stores/session'
 import { formatters } from '@/utils/fieldFormatters'
 import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
@@ -8,23 +8,22 @@ import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
 const session = useSessionStore()
 
 const columns = [
-  { name: 'clave', label: 'U.M', field: 'clave', align: 'left', sortable: true },
   { name: 'descripcion', label: 'Descripción', field: 'descripcion', align: 'left', sortable: true },
-  { name: 'activa',
+  { name: 'activo',
     label: 'Activa',
-    field: row => formatters.activa(row.activa),
+    field: row => formatters.activa(row.activo),
     align: 'center',
     sortable: true
-   }
+  },
 ]
 
-const CrudComponent = createCrudListView(useMedidas, columns, {
+const CrudComponent = createCrudListView(useTiposHabilitaciones, columns, {
   showActions: session.isAdminempresa,
   noEdit: !session.isAdminempresa,
-  noDelete: !session.isAdminempresa,
+  noDelete: true,
   noView: true,
   onAction: (action, row) => {
-    console.log(`Acción ${action} en medidas:`, row)
+    console.log(`Acción ${action} en tipos de habilitaciones:`, row)
   }
 })
 </script>

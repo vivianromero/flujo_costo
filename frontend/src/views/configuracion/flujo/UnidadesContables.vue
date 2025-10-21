@@ -24,6 +24,7 @@ const CrudComponent = createCrudListView(useUnidades, columns, {
   showActions: session.isAdminempresa,
   noEdit: !session.isAdminempresa,
   noDelete: true,
+  noView: true,
   onAction: (action, row) => {
     console.log(`Acción ${action} en unidades:`, row)
   }

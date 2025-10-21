@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createCrudListView } from '@/factories/createCrudListView'
-import { useMedidas } from '@/composables/useMedidas'
+import { useTiposDocumentos } from '@/composables/useTiposDocumentos'
 import { useSessionStore } from '@/stores/session'
 import { formatters } from '@/utils/fieldFormatters'
 import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
@@ -8,23 +8,26 @@ import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
 const session = useSessionStore()
 
 const columns = [
-  { name: 'clave', label: 'U.M', field: 'clave', align: 'left', sortable: true },
   { name: 'descripcion', label: 'Descripción', field: 'descripcion', align: 'left', sortable: true },
-  { name: 'activa',
-    label: 'Activa',
-    field: row => formatters.activa(row.activa),
+  { name: 'operacion', label: 'Operación',
+     field: row => formatters.entradaSalida(row.operacion),
+     align: 'left', sortable: true },
+  { name: 'prefijo', label: 'Prefijo', field: 'prefijo', align: 'left', sortable: true },
+  { name: 'generado',
+    label: 'Generado',
+    field: row => formatters.siNo(row.generado),
     align: 'center',
     sortable: true
-   }
+  },
 ]
 
-const CrudComponent = createCrudListView(useMedidas, columns, {
+const CrudComponent = createCrudListView(useTiposDocumentos, columns, {
   showActions: session.isAdminempresa,
   noEdit: !session.isAdminempresa,
-  noDelete: !session.isAdminempresa,
+  noDelete: true,
   noView: true,
   onAction: (action, row) => {
-    console.log(`Acción ${action} en medidas:`, row)
+    console.log(`Acción ${action} en tipos de documentos:`, row)
   }
 })
 </script>
