@@ -2,11 +2,12 @@ import graphene
 import graphql_jwt
 
 from apps.configuracion.schema import ConfiguracionQuery, ConfiguracionMutation, UserUebType
-from apps.codificadores.schema import CodificadoresQuery, CodificadoresMutation
+from apps.codificadores.schema import CodificadoresQuery, CodificadoresMutation, ProductoFlujoQuery
 # Si tienes otros módulos, los importas igual:
 
 
 class Query(CodificadoresQuery,
+            ProductoFlujoQuery,
             graphene.ObjectType):
     me = graphene.Field(UserUebType)
 

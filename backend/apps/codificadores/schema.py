@@ -13,7 +13,6 @@ class CentroCostoType(DjangoObjectType):
         model = CentroCosto
         fields = ("id", "clave", "descripcion", "activo")
 
-
 class DepartamentoType(DjangoObjectType):
     class Meta:
         model = Departamento
@@ -28,7 +27,6 @@ class MedidaType(DjangoObjectType):
     class Meta:
         model = Medida
         fields = ("id", "clave", "descripcion", "activa")
-
 
 class MedidaConversionType(DjangoObjectType):
     class Meta:
@@ -59,6 +57,12 @@ class MarcaSalidaType(DjangoObjectType):
     class Meta:
         model = MarcaSalida
         fields = ("id", "codigo", "descripcion", "activa")
+
+
+class ProductoFlujoType(DjangoObjectType):
+    class Meta:
+        model = ProductoFlujo
+        fields = '__all__'
 
 # =====================================================
 #  CONNECTION
@@ -93,6 +97,10 @@ class MotivoAjusteConnection(PaginatedType):
 
 class MarcaSalidaConnection(PaginatedType):
     items = graphene.List(MarcaSalidaType)
+
+class ProductoFlujoConnection(PaginatedType):
+    items = graphene.List(ProductoFlujoType)
+
 
 # =====================================================
 #  QUERIES
@@ -305,6 +313,55 @@ class CodificadoresQuery(graphene.ObjectType):
         items, total = paginate_queryset(qs, page, limit)
         return MedidaConnection(items=items, total_count=total)
 
+class ProductoFlujoQuery(graphene.ObjectType):
+    productos_flujo = graphene.Field(
+        ProductoFlujoConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        search=graphene.String(),  # Búsqueda en código/descripción
+        activo=graphene.Boolean(),  # Filtro por estado
+        tipoproducto_id=graphene.ID(),  # Filtro por tipo de producto
+        medida_id=graphene.ID(),  # Filtro por unidad de medida
+        opcion_menu=graphene.String()  # Para tu filtro fijo
+    )
+
+    def resolve_productos_flujo(root, info, page, limit,
+                                search=None, activo=None, tipoproducto_id=None,
+                                medida_id=None, opcion_menu=None):
+
+        qs = ProductoFlujo.objects.select_related("medida", "tipoproducto").prefetch_related("vitolas")
+
+        # 🔥 FILTRO FIJO PARA LA OPCIÓN DEL MENÚ
+        if opcion_menu == 'materiasprimas_subprod_habilit_excluir_capaclasificada':
+            from .models import ChoiceTiposProd, ChoiceClasesMatPrima
+            return qs.filter(
+                tipoproducto__in=[
+                    ChoiceTiposProd.MATERIAPRIMA,
+                    ChoiceTiposProd.SUBPRODUCTO,
+                    ChoiceTiposProd.HABILITACIONES
+                ]
+            ).exclude(
+                productoflujoclase_producto__clasemateriaprima=ChoiceClasesMatPrima.CAPACLASIFICADA
+            )
+
+        # 🔥 FILTROS NORMALES (igual que tus otros resolvers)
+        if search:
+            qs = qs.filter(
+                Q(codigo__icontains=search) |
+                Q(descripcion__icontains=search)
+            )
+
+        if activo is not None:
+            qs = qs.filter(activo=activo)
+
+        if tipoproducto_id:
+            qs = qs.filter(tipoproducto_id=tipoproducto_id)
+
+        if medida_id:
+            qs = qs.filter(medida_id=medida_id)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return ProductoFlujoConnection(items=items, total_count=total)
 # =====================================================
 #  MUTATIONS
 # =====================================================
