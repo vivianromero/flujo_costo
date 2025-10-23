@@ -31,7 +31,8 @@ const CrudComponent = createCrudListView(useMotivosAjuste, columns, {
   noCreate: !session.isAdminempresa,
   onAction: (action, row) => {
     console.log(`Acción ${action} en motivos de ajuste:`, row)
-  }
+  },
+  loadAll: true
 })
 </script>
 

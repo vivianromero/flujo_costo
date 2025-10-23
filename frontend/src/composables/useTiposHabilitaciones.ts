@@ -1,23 +1,8 @@
 // 🔹 Este composable usa paginado local con limit 9999
 // 🔹 Asume que la cantidad de tipos de g¡habilitaciones no supera ese valor
 // 🔹 Si se supera, los datos se truncarán silenciosamente
-import { computed } from 'vue'
-import type { Ref } from 'vue'
-import { useSmartPagination } from '@/composables/useSmartPagination'
-import { gql } from 'graphql-tag'
-
-const GET_TIPOSHABILITACIONES = gql`
-  query GetTiposHabilitaciones($page: Int!, $limit: Int!, $descripcion: String, $activo: Boolean) {
-    tiposhabilitaciones(page: $page, limit: $limit, descripcion: $descripcion, activo: $activo) {
-      items {
-        id
-        descripcion
-        activo
-      }
-      totalCount
-    }
-  }
-`
+import { useGenericCompusable } from '@/composables/useGenericCompusable'
+import { GET_TIPOSHABILITACIONES } from '@/graphql/queries/tiposhabilitaciones'
 
 export function useTiposHabilitaciones(options: {
   pagination: Ref<{ page: number; rowsPerPage: number; sortBy?: string; descending?: boolean }>
@@ -25,25 +10,14 @@ export function useTiposHabilitaciones(options: {
   activo?: Ref<boolean | null>
   columns?: any[]
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    descripcion: options.descripcion?.value ?? null,
-    activo: options.activo?.value ?? null,
-  }))
-
-  const smartPagination = useSmartPagination({
+  return useGenericCompusable({
     query: GET_TIPOSHABILITACIONES,
-    variables,
     pagination: options.pagination,
-    columns: options.columns
+    filters: {
+      descripcion: options.descripcion!,
+      activo: options.activo!
+    },
+    columns: options.columns,
+    loadAll: options.loadAll
   })
-
-  return {
-    rows: smartPagination.rows,
-    loading: smartPagination.loading,
-    totalCount: smartPagination.totalCount,
-    refetch: smartPagination.refetch,
-    allRows: smartPagination.allRows // Para debug
-  }
 }

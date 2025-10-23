@@ -21,7 +21,8 @@ const CrudComponent = createCrudListView(useTiposProductos, columns, {
   noCreate: true,
   onAction: (action, row) => {
     console.log(`Acción ${action} en tipos de productos:`, row)
-  }
+  },
+  loadAll: true
 })
 </script>
 

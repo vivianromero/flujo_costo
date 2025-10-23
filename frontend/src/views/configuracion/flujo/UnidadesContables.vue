@@ -32,22 +32,7 @@ const CrudComponent = createCrudListView(useUnidades, columns, {
   onAction: (action, row) => {
     console.log(`Acción ${action} en unidades:`, row)
   },
-
-  onTopAction: (action) => {
-    console.log(`Acción superior ${action} en unidades`)
-    switch (action) {
-      case 'create':
-        // Navegar a formulario de creación
-        router.push('/unidades/crear')
-        break
-      case 'export':
-        exportarDatos()
-        break
-      case 'fetchFromSystem':
-        traerDesdeSistemaX()
-        break
-    }
-  }
+  loadAll: true
 })
 </script>
 

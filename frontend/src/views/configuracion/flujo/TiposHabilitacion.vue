@@ -27,7 +27,8 @@ const CrudComponent = createCrudListView(useTiposHabilitaciones, columns, {
   noCreate: !session.isAdminempresa,
   onAction: (action, row) => {
     console.log(`Acción ${action} en tipos de habilitaciones:`, row)
-  }
+  },
+  loadAll: true
 })
 </script>
 

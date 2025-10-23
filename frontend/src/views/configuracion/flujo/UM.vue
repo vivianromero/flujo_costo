@@ -29,7 +29,8 @@ const CrudComponent = createCrudListView(useMedidas, columns, {
   noCreate: true,
   onAction: (action, row) => {
     console.log(`Acción ${action} en medidas:`, row)
-  }
+  },
+  loadAll: true
 })
 </script>
 

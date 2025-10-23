@@ -31,7 +31,8 @@ const CrudComponent = createCrudListView(useTiposDocumentos, columns, {
   noCreate: true,
   onAction: (action, row) => {
     console.log(`Acción ${action} en tipos de documentos:`, row)
-  }
+  },
+  loadAll: true
 })
 </script>
 
