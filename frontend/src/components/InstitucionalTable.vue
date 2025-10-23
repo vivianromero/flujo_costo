@@ -120,10 +120,12 @@
               @click="emit('refresh')"
               class="refresh-btn"
             >
+              <span></span> <!-- 🔹 Ancla para el tooltip -->
               <q-tooltip anchor="top middle" self="bottom middle">
                 {{ props.refreshTooltip || 'Actualizar Datos' }}
               </q-tooltip>
             </q-btn>
+
           </div>
 
           <!-- 📄 Controles de paginación a la derecha -->

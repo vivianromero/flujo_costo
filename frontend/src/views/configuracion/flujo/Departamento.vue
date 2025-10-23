@@ -29,7 +29,6 @@ const columns = [
 const CrudComponent = createCrudListView(useDepartamentos, columns, {
   showActions: true,
   loadAll: true,
-  rowsPerPage: 5,
   noEdit: !session.isAdminempresa,
   noDelete: !session.isAdminempresa,
   noFetchFromSystem: true,

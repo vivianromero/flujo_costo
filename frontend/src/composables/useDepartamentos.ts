@@ -36,12 +36,25 @@ export function useDepartamentos(options: {
   const loadAll = options.loadAll ?? false
 
   // 🔹 Variables reactivas para Apollo
+
   const variables = ref({
-    page: loadAll ? 1 : options.pagination.value.page,
-    limit: loadAll ? 99999 : options.pagination.value.rowsPerPage,
+    page: 1,
+    limit: 99999,
     centroId: options.centroId?.value ?? null,
     centroActivo: options.centroActivo?.value ?? null
   })
+
+  if (!loadAll) {
+    variables.value.page = options.pagination.value.page
+    variables.value.limit = options.pagination.value.rowsPerPage
+
+    watch(options.pagination, (newVal) => {
+      variables.value.page = newVal.page
+      variables.value.limit = newVal.rowsPerPage
+    }, { deep: true })
+  }
+
+
 
   // 🔹 Actualizar variables si cambian las dependencias
   if (options.centroId) {

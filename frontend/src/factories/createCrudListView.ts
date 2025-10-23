@@ -24,7 +24,6 @@
 import { defineComponent, h, ref, watch, computed } from 'vue'
 import InstitucionalTable from '@/components/InstitucionalTable.vue'
 
-
 interface TopAction {
   name: string
   label: string
@@ -38,6 +37,7 @@ interface CrudOptions {
   rowsPerPageOptions?: number[]
   rowsPerPage?: number
   showActions?: boolean
+  loadAll?: boolean
   customActions?: TableAction[]
   onAction?: (action: string, row: any) => void
 
@@ -67,6 +67,7 @@ export function createCrudListView(
     setup() {
       const {
         rowsPerPage = 15,
+        loadAll = false,
         showActions = true,
         customActions,
         onAction,
@@ -100,7 +101,8 @@ export function createCrudListView(
 
       const { rows, loading, totalCount, refetch } = useComposable({
         pagination,
-        columns: tableColumns
+        columns: tableColumns,
+        loadAll: loadAll
       })
 
       watch(totalCount, (newTotal) => {

@@ -52,9 +52,15 @@ export function useSmartPagination(options: {
   const loading = ref(true)
   const totalCount = ref(0)
 
-  const { result, refetch, onResult, onError } = useQuery(options.query, options.variables, {
+  const staticVariables = options.loadAll
+  ? JSON.parse(JSON.stringify(options.variables.value)) // 🔥 Usar el valor del ref
+  : options.variables
+
+
+  const { result, refetch, onResult, onError } = useQuery(options.query, staticVariables, {
     fetchPolicy: 'cache-first'
   })
+
 
   // 🔥 MANEJO DE ERRORES
   onError((error) => {
@@ -90,7 +96,6 @@ export function useSmartPagination(options: {
         }
       }
     }
-
     console.warn('⚠️ No se pudo extraer estructura de datos conocida:', data)
     return { items: [], totalCount: 0 }
   }
@@ -184,33 +189,53 @@ export function useSmartPagination(options: {
 
 
   // 📥 WATCHERS Y MOUNTED
+
   onMounted(() => {
-    if (result.value) {
-      processData(result.value)
-    } else {
-      console.log('⏳ Esperando datos iniciales...')
-    }
-  })
+  if (result.value) {
+    processData(result.value)
+  } else {
+    console.log('⏳ Esperando datos iniciales...')
+  }
+})
+
 
   // Usar onResult para mejor control
-  onResult((queryResult) => {
+let alreadyLoaded = false
 
-    if (queryResult.data) {
-      processData(queryResult.data)
-    }
+onResult((queryResult) => {
+  if (options.loadAll && alreadyLoaded) return
+  if (queryResult.data) {
+    processData(queryResult.data)
+    if (options.loadAll) alreadyLoaded = true
+  }
+  loading.value = queryResult.loading
+})
 
-    loading.value = queryResult.loading
-  })
 
   watch(() => options.pagination.value, () => {
     paginate()
   }, { deep: true })
 
+  async function forceRefetch() {
+   loading.value = true
+   try {
+     const result = await refetch()
+     if (result.data) {
+       processData(result.data)
+     }
+   } catch (err) {
+     console.error('❌ Error en refetch manual:', err)
+   } finally {
+     loading.value = false
+   }
+ }
+
+
   return {
     rows,
     loading,
     totalCount,
-    refetch,
+    refetch: forceRefetch,
     allRows
   }
 }
