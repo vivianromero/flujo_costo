@@ -30,12 +30,15 @@ export function useDepartamentos(options: {
   pagination: Ref<{ page: number; rowsPerPage: number; sortBy?: string; descending?: boolean }>
   centroId?: Ref<string | null>
   centroActivo?: Ref<boolean | null>
-  columns?: any[] // Opcional: pasar columns para ordenamiento con funciones
+  columns?: any[]
+  loadAll?: boolean
 }) {
+  const loadAll = options.loadAll ?? false
+
   // 🔹 Variables reactivas para Apollo
   const variables = ref({
-    page: 1,
-    limit: 99999,
+    page: loadAll ? 1 : options.pagination.value.page,
+    limit: loadAll ? 99999 : options.pagination.value.rowsPerPage,
     centroId: options.centroId?.value ?? null,
     centroActivo: options.centroActivo?.value ?? null
   })
@@ -53,14 +56,22 @@ export function useDepartamentos(options: {
     })
   }
 
+  // 🔹 Actualizar paginación si loadAll es false
+  if (!loadAll) {
+    watch(options.pagination, (newVal) => {
+      variables.value.page = newVal.page
+      variables.value.limit = newVal.rowsPerPage
+    }, { deep: true })
+  }
+
   const smartPagination = useSmartPagination({
     query: GET_DEPARTAMENTOS,
     variables,
     pagination: options.pagination,
-    columns: options.columns
+    columns: options.columns,
+    loadAll
   })
 
-  // 🔹 Refrescar al montar (por si viene del menú)
   smartPagination.refetch()
 
   return {
@@ -71,3 +82,4 @@ export function useDepartamentos(options: {
     allRows: smartPagination.allRows
   }
 }
+

@@ -45,6 +45,7 @@ export function useSmartPagination(options: {
   variables: any
   pagination: Ref<{ page: number; rowsPerPage: number; sortBy?: string; descending?: boolean }>
   columns?: any[]
+  loadAll?: boolean
 }) {
   const allRows = ref<any[]>([])
   const rows = ref<any[]>([])
@@ -164,14 +165,23 @@ export function useSmartPagination(options: {
 
   // 🔥 MANEJO DE DATOS MEJORADO
   function processData(data: any) {
-    const { items, totalCount: count } = extractData(data)
+  const { items, totalCount: count } = extractData(data)
 
-    allRows.value = items
+  allRows.value = items
+  totalCount.value = count
+  loading.value = false
+
+  if (options.loadAll) {
+    // 🔹 Si se cargan todos, paginar localmente
+    paginate()
+  } else {
+    // 🔹 Si no, usar solo los datos de la página actual
+    const { page, rowsPerPage } = options.pagination.value
+    rows.value = items
     totalCount.value = count
-    loading.value = false
-
-     paginate()
   }
+}
+
 
   // 📥 WATCHERS Y MOUNTED
   onMounted(() => {

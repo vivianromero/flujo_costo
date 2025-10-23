@@ -2,6 +2,7 @@
 import { createCrudListView } from '@/factories/createCrudListView'
 import { useDepartamentos } from '@/composables/useDepartamentos'
 import { useSessionStore } from '@/stores/session'
+import { ref } from 'vue'
 import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
 
 const session = useSessionStore()
@@ -27,6 +28,8 @@ const columns = [
 
 const CrudComponent = createCrudListView(useDepartamentos, columns, {
   showActions: true,
+  loadAll: true,
+  rowsPerPage: 5,
   noEdit: !session.isAdminempresa,
   noDelete: !session.isAdminempresa,
   noFetchFromSystem: true,
