@@ -97,7 +97,7 @@ MENU = [
                                     "id": 'id_nav_link_productos_mp',
                                     "name": "Mat.Primas, Materiales, Habilitaciones y Subproductos",
                                     "icon_class": 'fa fa-box',
-                                    "url": "/configuracion/flujo/productos",
+                                    "url": "/configuracion/flujo/productoflujo",
                                     "validators": ["apps.app_auth.usuarios.validators.is_adminoroperador"],
                                 },
                                 {
@@ -126,13 +126,6 @@ MENU = [
                                     "name": "Normas",
                                     "icon_class": 'fa fa-file-contract',
                                     "url": "/configuracion/flujo/normas",
-                                    "validators": ["apps.app_auth.usuarios.validators.is_adminoroperador"],
-                                },
-                                {
-                                    "id": 'id_nav_link_cambio_de_productos',
-                                    "name": "Cambio de Productos",
-                                    "icon_class": 'fa fa-retweet',
-                                    "url": "/configuracion/flujo/cambioproducto",
                                     "validators": ["apps.app_auth.usuarios.validators.is_adminoroperador"],
                                 },
                             ]

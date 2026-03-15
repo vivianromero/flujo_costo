@@ -1,4 +1,6 @@
 // 🔥 FORMATEADOR PARA CAMPOS BOOLEANOS
+
+// Formatter genérico existente
 export const booleanFormatter = (value: boolean, options: {
   trueText?: string,
   falseText?: string
@@ -9,6 +11,22 @@ export const booleanFormatter = (value: boolean, options: {
   } = options
 
   return value ? trueText : falseText
+}
+
+// Nuevo formatter específico para Activo/Inactivo
+export const activoFormatter = (value: boolean) => {
+  return booleanFormatter(value, {
+    trueText: '✅ Activo',
+    falseText: '❌ Inactivo'
+  })
+}
+
+// Si quieres también para femenino (Activa/Inactiva)
+export const activaFormatter = (value: boolean) => {
+  return booleanFormatter(value, {
+    trueText: '✅ Activa',
+    falseText: '❌ Inactiva'
+  })
 }
 
 // 🔥 FORMATEADOR PARA CAMPOS DE TEXTO (E/S, etc.)

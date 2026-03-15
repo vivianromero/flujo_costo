@@ -27,14 +27,16 @@ export function useMedidas(options: {
   activo?: Ref<boolean | null>
   columns?: any[]
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    clave: options.clave?.value ?? null,
-    descripcion: options.descripcion?.value ?? null,
-    activa: options.activa?.value ?? null
-  }))
-
+    const variables = computed(() => {
+      const vars: Record<string, any> = {
+        page: options.pagination.value.page,
+        limit: options.pagination.value.rowsPerPage,
+      }
+      if (options.clave?.value) vars.clave = options.clave.value
+      if (options.descripcion?.value) vars.descripcion = options.descripcion.value
+      if (options.activa?.value) vars.activa = options.activa.value
+      return vars
+    })
   const smartPagination = useSmartPagination({
     query: GET_MEDIDAS,
     variables,

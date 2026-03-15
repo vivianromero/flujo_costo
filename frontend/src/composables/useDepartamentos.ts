@@ -31,12 +31,16 @@ export function useDepartamentos(options: {
   centroActivo?: Ref<boolean | null>
   columns?: any[] // 🔥 Opcional: pasar columns para ordenamiento con funciones
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    centroId: options.centroId?.value ?? null,
-    centroActivo: options.centroActivo?.value ?? null
-  }))
+
+    const variables = computed(() => {
+      const vars: Record<string, any> = {
+        page: options.pagination.value.page,
+        limit: options.pagination.value.rowsPerPage,
+      }
+      if (options.centroId?.value) vars.centroId = options.centroId.value
+      if (options.centroActivo?.value) vars.centroActivo = options.centroActivo.value
+      return vars
+    })
 
   const smartPagination = useSmartPagination({
     query: GET_DEPARTAMENTOS,

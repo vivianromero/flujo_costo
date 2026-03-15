@@ -29,13 +29,17 @@ export function useUnidades(options: {
   activo?: Ref<boolean | null>
   columns?: any[]
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    codigo: options.codigo?.value ?? null,
-    nombre: options.nombre?.value ?? null,
-    activo: options.activo?.value ?? null
-  }))
+
+    const variables = computed(() => {
+      const vars: Record<string, any> = {
+        page: options.pagination.value.page,
+        limit: options.pagination.value.rowsPerPage,
+      }
+      if (options.codigo?.value) vars.codigo = options.codigo.value
+      if (options.nombre?.value) vars.nombre = options.nombre.value
+      if (options.activo?.value) vars.activo = options.activo.value
+      return vars
+    })
 
   const smartPagination = useSmartPagination({
     query: GET_UNIDADES,

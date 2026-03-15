@@ -2,7 +2,7 @@
 import { createCrudListView } from '@/factories/createCrudListView'
 import { useTiposHabilitaciones } from '@/composables/useTiposHabilitaciones'
 import { useSessionStore } from '@/stores/session'
-import { formatters } from '@/utils/fieldFormatters'
+import { activaFormatter } from '@/utils/fieldFormatters'
 import BaseCrudView from '@/components/cruds/BaseCrudView.vue'
 
 const session = useSessionStore()
@@ -11,7 +11,7 @@ const columns = [
   { name: 'descripcion', label: 'Descripción', field: 'descripcion', align: 'left', sortable: true },
   { name: 'activo',
     label: 'Activa',
-    field: row => formatters.activa(row.activo),
+    field: activaFormatter,
     align: 'center',
     sortable: true
   },

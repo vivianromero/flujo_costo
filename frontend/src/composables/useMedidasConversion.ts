@@ -33,13 +33,17 @@ export function useMedidasConversion(options: {
   medidad?: Ref<string | null>
   columns?: any[]
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    factorConversion: options.factorConversion?.value ?? null,
-    medidao: options.medidao?.value ?? null,
-    medidad: options.medidad?.value ?? null
-  }))
+
+    const variables = computed(() => {
+      const vars: Record<string, any> = {
+        page: options.pagination.value.page,
+        limit: options.pagination.value.rowsPerPage,
+      }
+      if (options.factorConversion?.value) vars.factorConversion = options.factorConversion.value
+      if (options.medidao?.value) vars.medidao = options.medidao.value
+      if (options.medidad?.value) vars.medidad = options.medidad.value
+      return vars
+    })
 
   const smartPagination = useSmartPagination({
     query: GET_MEDIDASCONVERSION,

@@ -261,10 +261,6 @@ class ProductoFlujo(ObjectsManagerAbstract):
     def __str__(self):
         return "%s | %s" % (self.codigo, self.descripcion)
 
-    @property
-    def get_clasemateriaprima(self):
-        return None if self.tipoproducto.pk != ChoiceTiposProd.MATERIAPRIMA else self.productoflujoclase_producto.get().clasemateriaprima
-
 class ProductoFlujoClase(ObjectsManagerAbstract):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     clasemateriaprima = models.ForeignKey(ClaseMateriaPrima, on_delete=models.PROTECT,

@@ -29,15 +29,17 @@ export function useTiposDocumentos(options: {
   generado?: Ref<boolean | null>
   columns?: any[]
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    descripcion: options.descripcion?.value ?? null,
-    operacion: options.operacion?.value ?? null,
-    prefijo: options.prefijo?.value ?? null,
-    generado: options.generado?.value ?? null
-  }))
-
+     const variables = computed(() => {
+      const vars: Record<string, any> = {
+        page: options.pagination.value.page,
+        limit: options.pagination.value.rowsPerPage,
+      }
+      if (options.descripcion?.value) vars.descripcion = options.descripcion.value
+      if (options.operacion?.value) vars.operacion = options.operacion.value
+      if (options.prefijo?.value) vars.prefijo = options.prefijo.value
+      if (options.generado?.value) vars.generado = options.generado.value
+      return vars
+    })
   const smartPagination = useSmartPagination({
     query: GET_TIPOSDOCUMENTOS,
     variables,

@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from .models import *
 from apps.utiles.utils import paginate_queryset
+from django.db.models import Q
 
 
 # =====================================================
@@ -19,10 +20,12 @@ class DepartamentoType(DjangoObjectType):
         model = Departamento
         fields = ("id", "codigo", "descripcion", "centrocosto")
 
+
 class UnidadContableType(DjangoObjectType):
     class Meta:
         model = UnidadContable
         fields = ("id", "codigo", "nombre", "is_empresa", "is_comercializadora", "activo")
+
 
 class MedidaType(DjangoObjectType):
     class Meta:
@@ -35,64 +38,116 @@ class MedidaConversionType(DjangoObjectType):
         model = MedidaConversion
         fields = ("id", "factor_conversion", "medidao", "medidad")
 
+
 class TipoDocumentoType(DjangoObjectType):
     class Meta:
         model = TipoDocumento
         fields = ("id", "descripcion", "operacion", "generado", "prefijo")
+
 
 class TipoProductoType(DjangoObjectType):
     class Meta:
         model = TipoProducto
         fields = ("id", "descripcion", "orden", "contabilizacion")
 
+
 class TipoHabilitacionType(DjangoObjectType):
     class Meta:
         model = TipoHabilitacion
         fields = ("id", "descripcion", "activo")
+
 
 class MotivoAjusteType(DjangoObjectType):
     class Meta:
         model = MotivoAjuste
         fields = ("id", "descripcion", "aumento", "activo")
 
+
 class MarcaSalidaType(DjangoObjectType):
     class Meta:
         model = MarcaSalida
         fields = ("id", "codigo", "descripcion", "activa")
 
+class ClaseMateriaPrimaType(DjangoObjectType):
+    class Meta:
+        model = ClaseMateriaPrima
+        fields = ("id", "descripcion", "capote_fortaleza")
+
+class ProductoFlujoType(DjangoObjectType):
+    medida_clave = graphene.String()
+    medida_descripcion = graphene.String()
+    tipo_producto = graphene.String()
+    clase_materiaprima = graphene.Field(ClaseMateriaPrimaType)
+
+    class Meta:
+        model = ProductoFlujo
+        fields = ("id", "codigo", "descripcion", "activo")
+
+    def resolve_medida_clave(self, info):
+        return self.medida.clave if self.medida else None
+
+    def resolve_medida_descripcion(self, info):
+        return self.medida.descripcion if self.medida else None
+
+    def resolve_tipo_producto(self, info):
+        return self.tipoproducto.descripcion if self.tipoproducto else None
+
+    def resolve_clase_materiaprima(self, info):
+        if self.tipoproducto.pk == ChoiceTiposProd.MATERIAPRIMA:
+            try:
+                return self.productoflujoclase_producto.get().clasemateriaprima
+            except:
+                return None
+        return None
+
 # =====================================================
 #  CONNECTION
 # =====================================================
+
 class PaginatedType(graphene.ObjectType):
     items = graphene.List(graphene.JSONString)
     total_count = graphene.Int()
 
+
 class UnidadContableConnection(PaginatedType):
     items = graphene.List(UnidadContableType)
+
 
 class DepartamentoConnection(PaginatedType):
     items = graphene.List(DepartamentoType)
 
+
 class MedidaConnection(PaginatedType):
     items = graphene.List(MedidaType)
+
 
 class MedidaConversionConnection(PaginatedType):
     items = graphene.List(MedidaConversionType)
 
+
 class TipoDocumentoConnection(PaginatedType):
     items = graphene.List(TipoDocumentoType)
+
 
 class TipoProductoConnection(PaginatedType):
     items = graphene.List(TipoProductoType)
 
+
 class TipoHabilitacionConnection(PaginatedType):
     items = graphene.List(TipoHabilitacionType)
+
 
 class MotivoAjusteConnection(PaginatedType):
     items = graphene.List(MotivoAjusteType)
 
+
 class MarcaSalidaConnection(PaginatedType):
     items = graphene.List(MarcaSalidaType)
+
+
+class ProductoFlujoConnection(PaginatedType):
+    items = graphene.List(ProductoFlujoType)
+
 
 # =====================================================
 #  QUERIES
@@ -178,6 +233,19 @@ class CodificadoresQuery(graphene.ObjectType):
         descripcion=graphene.String(),
         activa=graphene.Boolean(),
     )
+
+    productoflujo = graphene.Field(
+        ProductoFlujoConnection,
+        page=graphene.Int(required=True),
+        limit=graphene.Int(required=True),
+        codigo=graphene.String(),
+        descripcion=graphene.String(),
+        medidaClave=graphene.String(),
+        tipoProducto=graphene.String(),
+        claseMateriaprima=graphene.String(),
+        activo=graphene.Boolean(),
+    )
+
     def resolve_departamentos(root, info, page, limit, centro_id=None, centroActivo=None):
         qs = Departamento.objects.select_related("centrocosto")
 
@@ -233,7 +301,7 @@ class CodificadoresQuery(graphene.ObjectType):
             qs = qs.filter(medidad=medidad)
 
         items, total = paginate_queryset(qs, page, limit)
-        return MedidaConnection(items=items, total_count=total)
+        return MedidaConversionConnection(items=items, total_count=total)
 
     def resolve_tiposdocumentos(root, info, page, limit, descripcion=None, operacion=None, prefijo=None, generado=None):
         qs = TipoDocumento.objects.all()
@@ -247,53 +315,59 @@ class CodificadoresQuery(graphene.ObjectType):
         if prefijo:
             qs = qs.filter(prefijo__icontains=prefijo)
 
-        if generado:
+        if generado is not None:
             qs = qs.filter(generado=generado)
 
-
         items, total = paginate_queryset(qs, page, limit)
-        return MedidaConnection(items=items, total_count=total)
+        return TipoDocumentoConnection(items=items, total_count=total)
 
-    def resolve_tiposproductos(root, info, page, limit, descripcion=None):
+    def resolve_tiposproductos(root, info, page, limit, descripcion=None, orden=None,
+                               contabilizacion=None):
         qs = TipoProducto.objects.all()
 
         if descripcion:
             qs = qs.filter(descripcion__icontains=descripcion)
 
+        if orden is not None:
+            qs = qs.filter(orden=orden)
+
+        if contabilizacion:
+            qs = qs.filter(contabilizacion__icontains=contabilizacion)
+
         items, total = paginate_queryset(qs, page, limit)
-        return MedidaConnection(items=items, total_count=total)
+        return TipoProductoConnection(items=items, total_count=total)
 
     def resolve_tiposhabilitaciones(root, info, page, limit, descripcion=None, activo=None):
         qs = TipoHabilitacion.objects.all()
 
-        if activo:
+        if activo is not None:
             qs = qs.filter(activo=activo)
 
         if descripcion:
             qs = qs.filter(descripcion__icontains=descripcion)
 
         items, total = paginate_queryset(qs, page, limit)
-        return MedidaConnection(items=items, total_count=total)
+        return TipoHabilitacionConnection(items=items, total_count=total)
 
     def resolve_motivosajuste(root, info, page, limit, descripcion=None, aumento=None, activo=None):
         qs = MotivoAjuste.objects.all()
 
-        if activo:
+        if activo is not None:
             qs = qs.filter(activo=activo)
 
-        if aumento:
+        if aumento is not None:
             qs = qs.filter(aumento=aumento)
 
         if descripcion:
             qs = qs.filter(descripcion__icontains=descripcion)
 
         items, total = paginate_queryset(qs, page, limit)
-        return MedidaConnection(items=items, total_count=total)
+        return MotivoAjusteConnection(items=items, total_count=total)
 
     def resolve_marcassalida(root, info, page, limit, codigo=None, descripcion=None, activa=None):
         qs = MarcaSalida.objects.all()
 
-        if activa:
+        if activa is not None:
             qs = qs.filter(activa=activa)
 
         if codigo:
@@ -303,7 +377,36 @@ class CodificadoresQuery(graphene.ObjectType):
             qs = qs.filter(descripcion__icontains=descripcion)
 
         items, total = paginate_queryset(qs, page, limit)
-        return MedidaConnection(items=items, total_count=total)
+        return MarcaSalidaConnection(items=items, total_count=total)
+
+    def resolve_productoflujo(root, info, page, limit, codigo=None, descripcion=None, medidaClave=None,
+                              tipoProducto=None, claseMateriaprima=None, activo=None):
+
+        qs = ProductoFlujo.objects.filter(
+                    tipoproducto__in=[ChoiceTiposProd.MATERIAPRIMA, ChoiceTiposProd.SUBPRODUCTO,
+                                      ChoiceTiposProd.HABILITACIONES]).exclude(
+                    productoflujoclase_producto__clasemateriaprima=ChoiceClasesMatPrima.CAPACLASIFICADA).all()
+
+        if activo is not None:
+            qs = qs.filter(activo=activo)
+
+        if codigo:
+            qs = qs.filter(codigo__icontains=codigo)
+
+        if descripcion:
+            qs = qs.filter(descripcion__icontains=descripcion)
+
+        if medidaClave:
+            qs = qs.filter(Q(medida__clave__icontains=medidaClave) | Q(medida__descripcion__icontains=medidaClave))
+
+        if tipoProducto:
+            qs = qs.filter(tipoproducto__descripcion__icontains=tipoProducto)
+
+        if claseMateriaprima:
+            qs = qs.filter(productoflujoclase_producto__clasemateriaprima__descripcion__icontains=claseMateriaprima)
+
+        items, total = paginate_queryset(qs, page, limit)
+        return ProductoFlujoConnection(items=items, total_count=total)
 
 # =====================================================
 #  MUTATIONS
@@ -311,6 +414,7 @@ class CodificadoresQuery(graphene.ObjectType):
 
 class CodificadoresMutation(graphene.ObjectType):
     pass
+
 
 
 

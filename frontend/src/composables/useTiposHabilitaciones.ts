@@ -25,12 +25,16 @@ export function useTiposHabilitaciones(options: {
   activo?: Ref<boolean | null>
   columns?: any[]
 }) {
-  const variables = computed(() => ({
-    page: 1,
-    limit: 99999,
-    descripcion: options.descripcion?.value ?? null,
-    activo: options.activo?.value ?? null,
-  }))
+
+    const variables = computed(() => {
+      const vars: Record<string, any> = {
+        page: options.pagination.value.page,
+        limit: options.pagination.value.rowsPerPage,
+      }
+      if (options.descripcion?.value) vars.descripcion = options.descripcion.value
+      if (options.activo?.value) vars.activo = options.activo.value
+      return vars
+    })
 
   const smartPagination = useSmartPagination({
     query: GET_TIPOSHABILITACIONES,
