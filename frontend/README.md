@@ -19,14 +19,30 @@ Aplicación frontend para el sistema de gestión de flujo de costos, desarrollad
 
 ### Node.js
 - **Versión requerida:** 20.19.0 o superior (recomendada 22.22.1)
-- **Gestor recomendado:** NVM (Node Version Manager)
+- **Opción A (recomendada):** Usar NVM (Node Version Manager)
+- **Opción B:** Instalar Node.js directamente desde [nodejs.org](https://nodejs.org) (versión LTS)
 
 ### NPM
 - **Versión:** 10.x o superior (incluida con Node.js)
 
 ## 🔧 Configuración del Entorno
 
-### 1. Instalar NVM (si no lo tienes)
+### Backend (requisito previo)
+El frontend espera un backend corriendo en el puerto `9090` con el endpoint `/api`.
+
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
-source ~/.bashrc
+# El backend debe estar corriendo en:
+http://localhost:9090
+
+## 🔧 Configuración del Entorno
+
+### 1. Instalar npm (si no lo tienes)
+```bash
+npm install
+
+### 2. 🚀 Ejecución en Desarrollo
+```bash
+
+npm run dev
+
+La aplicación estará disponible en http://localhost:5173
